@@ -4,7 +4,7 @@
 
 This is a version of the [Pandemic model](https://github.com/ncsu-landscape-dynamics/Pandemic_Model) set up to run on NCSU's HPC, henry2. The key differences are:
 
-1. All paths are relative to the parent folder.
+1. All paths are relative to the parent directory.
 2. The model script is run from command line with five additional arguments: alpha, lamda, start year, start run (ie. 0), end run (eg. 49).
 3. Parallel processing with multiprocess and subprocess is limited by setting the Pool to 1. Multiple commands are instead submitted using [pynodelauncher](https://github.com/ncsu-landscape-dynamics/pynodelauncher), a Python adaptation of [launch](https://github.ncsu.edu/lllowe/launch), which administers the tasks in parallel across the cores requested from HPC.
 This, 
@@ -17,10 +17,10 @@ This,
 Clone this repository to HPC (recommended: to /share/$GROUP/$USER)
 
 ```
-git clone https://github.ncsu.edu/….
-cd …
+git clone https://github.com/arielsaffer/pandemic_hpc
+cd pandemic_hpc
 ```
-Run the [Pandemic Data Acquisition notebook](https://github.com/ncsu-landscape-dynamics/Pandemic_Model/blob/master/notebooks/1_data_acquisition_format.ipynb) locally and copy the input data to the "inputs" folder.
+Run the [Pandemic Data Acquisition notebook](https://github.com/ncsu-landscape-dynamics/Pandemic_Model/blob/master/notebooks/1_data_acquisition_format.ipynb) locally and copy to the "inputs" directory.
 
 Use nano to modify model parameters in 'global_config.py'. 
 ```
@@ -60,8 +60,8 @@ conda deactivate
 
 ### Contents
 
-- "pandemic" folder: Pandemic model scripts with limited modification
-- "hpc" folder: scripts specific to running the model on HPC
-- "inputs" folder: where all input data needs to be provided to the model
-- "outputs" folder: where all model outputs and summary statistics will go
-- files outside of folder: global_config.py to provide study parameters, LSF batch scripts to submit various tasks
+- "pandemic" directory: Pandemic model scripts with limited modification
+- "hpc" directory: scripts specific to running the model on HPC
+- "inputs" directory: where all input data needs to be provided to the model
+- "outputs" directory: where all model outputs and summary statistics will go
+- files in main directory: global_config.py to provide study parameters, LSF batch scripts to submit various tasks

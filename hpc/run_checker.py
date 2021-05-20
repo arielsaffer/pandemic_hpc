@@ -4,6 +4,8 @@ import itertools
 import json
 import os
 from dotenv import load_dotenv
+import re
+
 
 def complete_run_check(param_sample):
     # Empty dataframe for completed runs
@@ -13,18 +15,16 @@ def complete_run_check(param_sample):
 
     # Which runs were completed
     for param in param_sample:
-        sample = param.split("\\")[
-            -1
-        ]  ## "\\" to run locally, "/" on HPC or with multiprocess
+        sample = re.split("[\\\\/]", param)[-1]
+        # "\\" to run locally, "/" on HPC or with multiprocess
         start = sample.split("year")[1].split("_")[0]
-        alpha = param.split("alpha")[1].split("_")[0]
-        lamda = param.split("lamda")[1].split("_")[0]
+        alpha = sample.split("alpha")[1].split("_")[0]
+        lamda = sample.split("lamda")[1].split("_")[0]
         run_outputs = glob.glob(f"{param}/run*/pandemic_output_aggregated.csv")
         runs = []
         for output in run_outputs:
-            indiv = output.split("run_")[1].split("\\")[
-                0
-            ]  ## "\\" to run locally, "/" on HPC or with multiprocess
+            indiv = re.split("[\\\\/]", output.split("run_")[1])[0]
+            # "\\" to run locally, "/" on HPC or with multiprocess
             runs.append(int(indiv))
         for run in runs:
             completed_runs = completed_runs.append(
@@ -76,17 +76,17 @@ def run_checker(param_sample):
     pending_runs = pending_run_check(completed_runs, param_sets, full_set)
     return pending_runs
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Data paths from env
     load_dotenv(os.path.join(".env"))
     data_dir = os.getenv("DATA_PATH")
     input_dir = os.getenv("INPUT_PATH")
     out_dir = os.getenv("OUTPUT_PATH")
 
-    with open('config.json') as json_file:
+    with open("config.json") as json_file:
         config = json.load(json_file)
-
-    sim_name = config['sim_name']
+    sim_name = config["sim_name"]
     commodity = f"{config['start_commodity']}-{config['end_commodity']}"
 
     # Call the folders
@@ -97,6 +97,19 @@ if __name__ == '__main__':
     for sample in pending_runs:
         alpha, lamda, start = sample[0]
         missing_runs = sample[1]
-        output = " ".join(["python", "model_run_args.py", str(alpha), str(lamda), str(start), str(min(missing_runs)), str(max(missing_runs))]) + "\n"
+        output = (
+            " ".join(
+                [
+                    "python",
+                    "model_run_args.py",
+                    str(alpha),
+                    str(lamda),
+                    str(start),
+                    str(min(missing_runs)),
+                    str(max(missing_runs)),
+                ]
+            )
+            + "\n"
+        )
         file1.write(output)
     file1.close()

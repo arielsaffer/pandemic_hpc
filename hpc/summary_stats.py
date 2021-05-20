@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 import json
+import re
 
 
 def diff_metric(difference_val, threshold_val):
@@ -156,7 +157,7 @@ def compute_stat_wrapper_func(param_sample):
             "diff_total_countries_sqrd",
             "count_known_countries_predicted",
             "count_known_countries_time_window",
-            "diff_obs_pred_metric_KOR",
+            "diff_obs_pred_metric_KOR",  # set from validation df
             "diff_obs_pred_metric_JPN",
             "diff_obs_pred_metric_USA",
             "diff_obs_pred_metric_mean",
@@ -166,7 +167,7 @@ def compute_stat_wrapper_func(param_sample):
     )
     for i in range(0, len(run_outputs)):
         run_num = os.path.split(run_outputs[i])[0].split("run_")[-1]
-        sample = run_outputs[i].split("\\")[-3]  ## "\\" to run locally, "/" on HPC
+        sample = re.split("[\\\\/]", run_outputs[i])[-3]  # "\\" to run locally, "/" on HPC
         start = sample.split("year")[1].split("_")[0]
         alpha = sample.split("alpha")[1].split("_")[0]
         lamda = sample.split("lamda")[1].split("_")[0]
