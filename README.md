@@ -9,7 +9,7 @@ This is a version of the [Pandemic model](https://github.com/ncsu-landscape-dyna
 3. Parallel processing with multiprocess and subprocess is limited by setting the Pool to 1. Multiple commands are instead submitted using [pynodelauncher](https://github.com/ncsu-landscape-dynamics/pynodelauncher), a Python adaptation of [launch](https://github.ncsu.edu/lllowe/launch), which administers the tasks in parallel across the cores requested from HPC.
 This, 
     1. allows for the use of distributed (vs. shared) memory, and 
-    2. and prevents the model from spawning additional threads that could affect the performance of other jobs on shared nodes.
+    2. prevents the model from spawning additional threads that could affect the performance of other jobs on shared nodes.
 4. The commands are written to a text file, which is submitted with pynodelauncher from an LSF batch script. See the [tutorials](https://projects.ncsu.edu/hpc/Documents/LSF.php) for more information on how to use henry2. 
 
 ### How to use:
