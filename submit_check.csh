@@ -1,10 +1,9 @@
 #!/bin/tcsh
-#BSUB -n 2
+#BSUB -n 1
 #BSUB -x
-#BSUB -R span[hosts=1]
 #BSUB -R select[oc]
-#BSUB -W 2:30
-#BSUB -J summary_PoPSGlobal
+#BSUB -W 1:30 # Time depends on no. of runs aggregated
+#BSUB -J check_PoPSGlobal
 #BSUB -o stdout.%J
 #BSUB -e stderr.%J
 module load conda

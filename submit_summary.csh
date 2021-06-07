@@ -3,7 +3,7 @@
 #BSUB -x
 #BSUB -R span[hosts=1]
 #BSUB -R select[oc]
-#BSUB -W 2:30
+#BSUB -W 2:30 # Time depends on no. of runs aggregated
 #BSUB -J summary_PoPSGlobal
 #BSUB -o stdout.%J
 #BSUB -e stderr.%J
