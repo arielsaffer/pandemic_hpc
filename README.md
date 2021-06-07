@@ -17,7 +17,7 @@ This,
 Clone this repository to HPC (recommended: to /share/$GROUP/$USER)
 
 ```
-git clone https://github.com/arielsaffer/pandemic_hpc
+git clone https://github.com/ncsu-landscape-dynamics/pandemic_hpc
 cd pandemic_hpc
 ```
 Run the [Pandemic Data Acquisition notebook](https://github.com/ncsu-landscape-dynamics/Pandemic_Model/blob/master/notebooks/1_data_acquisition_format.ipynb) locally and copy to the "inputs" directory.
@@ -37,9 +37,9 @@ Modify or copy 'submit_launch.csh' to adjust the resources requested (especially
 
 Submit the script.
 
-Once your job is complete, if it finished without error, you can calculate the summary statistics. If the job was cut short by the time limit, you may need to resume runs. To check which runs were completed and write out commands for missing runs, use 'run_checker,py'. 
+Once your job is complete, if it finished without error, you can calculate the summary statistics. If the job was cut short by the time limit, you may need to resume runs. To check which runs were completed and write out commands for missing runs, adjust and submit 'submit_check.csh', which will run 'run_checker,py'. 
 
-Then modify 'submit_launch.csh' to include the new text file, 'pending_runs.txt', and the remaining resources needed.
+If there are pending runs, modify 'submit_launch.csh' to replace commands.txt with the new text file, 'pending_runs.txt', and the remaining resources needed.
 
 Once all the runs are completed, adjust and submit 'submit_summary.csh'. This script requests exclusive use of a single node to run in parallel with multiprocess using shared memory. 
 

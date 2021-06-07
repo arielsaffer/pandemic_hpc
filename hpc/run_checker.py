@@ -72,7 +72,8 @@ def run_checker(param_sample):
     # Create the range of runs expected, as a set
     full_set = set(range(start_run, end_run + 1))
 
-    completed_runs = complete_run_check(param_sample)
+    complete_run_check(param_sample)
+    completed_runs = pd.read_csv("completed_runs.csv")
     pending_runs = pending_run_check(completed_runs, param_sets, full_set)
     return pending_runs
 
