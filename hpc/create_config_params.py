@@ -19,6 +19,7 @@ def create_global_config_args(
     scaled_min,
     scaled_max,
     season_dict,
+    timestep,
     years_before_firstRecord,
     years_after_firstRecord,
     end_valid_year,
@@ -46,6 +47,7 @@ def create_global_config_args(
     args["scaled_min"] = scaled_min
     args["scaled_max"] = scaled_max
     args["season_dict"] = season_dict
+    args["timestep"] = timestep
     args["years_before_firstRecord"] = years_before_firstRecord
     args["years_after_firstRecord"] = years_after_firstRecord
     args["end_valid_year"] = end_valid_year
