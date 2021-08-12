@@ -4,7 +4,7 @@ import sys
 import numpy as np
 from dotenv import load_dotenv
 import pandas as pd
-import geopandas 
+import geopandas
 
 from helpers import create_trades_list
 from model_equations_quiet import pandemic_multiple_time_steps
@@ -12,7 +12,7 @@ from output_files import (
     aggregate_monthly_output_to_annual,
     create_model_dirs,
     save_model_output,
-    write_model_metadata
+    write_model_metadata,
 )
 
 # Read environmental variables
@@ -147,7 +147,7 @@ for i in range(len(trades_list)):
             time_infect_units=time_infect_units,
             time_infect=time_infect,
             gamma_shape=gamma_shape,
-            gamma_scale=gamma_scale
+            gamma_scale=gamma_scale,
         )
 
         sim_name = sys.argv[2]
@@ -164,7 +164,14 @@ for i in range(len(trades_list)):
         }
 
         outpath = out_dir + f"/{sim_name}/{run_prefix}/run_{run_num}/"
-        create_model_dirs(outpath=outpath, output_dict=arr_dict)
+        create_model_dirs(
+            outpath=outpath,
+            output_dict=arr_dict,
+            write_entry_probs=save_entry,
+            write_estab_probs=save_estab,
+            write_intro_probs=save_intro,
+            write_country_intros=save_country_intros,
+        )
         print("saving pandemic outputs: ", outpath)
         full_out_df = save_model_output(
             model_output_object=e,
