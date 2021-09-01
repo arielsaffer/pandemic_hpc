@@ -19,7 +19,7 @@ end_run = config["end_run"]
 
 # Write to a text file
 
-file1 = open("commands.txt", "a")
+file1 = open("commands.txt", "w")
 for params in param_sets:
     output = (
         " ".join(
