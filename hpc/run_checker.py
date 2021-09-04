@@ -20,7 +20,7 @@ def complete_run_check(param_sample):
         start = sample.split("year")[1].split("_")[0]
         alpha = sample.split("alpha")[1].split("_")[0]
         lamda = sample.split("lamda")[1].split("_")[0]
-        run_outputs = glob.glob(f"{param}/run*/pandemic_output_aggregated.csv")
+        run_outputs = glob.glob(f"{param}/run*/origin_destination.csv")
         runs = []
         for output in run_outputs:
             indiv = re.split("[\\\\/]", output.split("run_")[1])[0]
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     param_sample = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")
     pending_runs = run_checker(param_sample)
 
-    file1 = open("pending_runs.txt", "a")
+    file1 = open("pending_runs.txt", "w")
     for sample in pending_runs:
         alpha, lamda, start = sample[0]
         missing_runs = sample[1]
