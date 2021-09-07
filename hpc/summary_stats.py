@@ -95,6 +95,10 @@ def compute_summary_stats(
         )
     year_probs_dict = dict(zip(year_probs_dict_keys, year_probs_dict_values))
 
+    countries_dict = {}
+    for ISO3 in validation_df.index:
+        countries_dict[f"diff_obs_pred_metric_{ISO3}"] = model_output.loc[ISO3]["obs-pred_metric"]
+
     # Save results in dictionary from which to build the dataframe
     summary_stats_dict = {
         "total_countries_intros_predicted": total_intros_predicted,
@@ -106,9 +110,6 @@ def compute_summary_stats(
         "count_known_countries_time_window": model_output.loc[validation_df.index][
             "temp_acc"
         ].sum(),
-        "diff_obs_pred_metric_KOR": model_output.loc["KOR"]["obs-pred_metric"],
-        "diff_obs_pred_metric_JPN": model_output.loc["JPN"]["obs-pred_metric"],
-        "diff_obs_pred_metric_USA": model_output.loc["USA"]["obs-pred_metric"],
         "diff_obs_pred_metric_mean": model_output.loc[validation_df.index][
             "obs-pred_metric"
         ].mean(),
@@ -116,7 +117,8 @@ def compute_summary_stats(
             "obs-pred_metric"
         ].std(),
     }
-    summary_stats_dict = {**summary_stats_dict, **year_probs_dict}
+    
+    summary_stats_dict = {**summary_stats_dict, **year_probs_dict, **countries_dict}
 
     return model_output, summary_stats_dict
 
@@ -145,6 +147,10 @@ def compute_stat_wrapper_func(param_sample):
     year_probs_dict_keys = []
     for year in sim_years:
         year_probs_dict_keys.append(f"prob_by_{year}_{coi}")
+    # Set up difference by recorded country dictionary keys (column names)
+    countries_dict_keys = []
+    for ISO3 in validation_df.index:
+        countries_dict_keys.append(f"diff_obs_pred_metric_{ISO3}")
     summary_stat_df = pd.DataFrame(
         columns=[
             "sample",
@@ -157,13 +163,11 @@ def compute_stat_wrapper_func(param_sample):
             "diff_total_countries_sqrd",
             "count_known_countries_predicted",
             "count_known_countries_time_window",
-            "diff_obs_pred_metric_KOR",  # set from validation df
-            "diff_obs_pred_metric_JPN",
-            "diff_obs_pred_metric_USA",
             "diff_obs_pred_metric_mean",
             "diff_obs_pred_metric_stdev",
         ]
         + year_probs_dict_keys
+        + countries_dict_keys
     )
     for i in range(0, len(run_outputs)):
         run_num = os.path.split(run_outputs[i])[0].split("run_")[-1]

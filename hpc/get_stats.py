@@ -19,18 +19,24 @@ if __name__ == "__main__":
     coi = config["country_of_interest"]
     native_countries_list = config["native_countries_list"]
 
-    # Set up probability by year dictionary keys (column names)
-    sim_years = config["sim_years"]
-    year_probs_dict_keys = []
-    for year in sim_years:
-        year_probs_dict_keys.append(f"prob_by_{year}_{coi}")
-
     param_samp = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")
     validation_df = pd.read_csv(
         input_dir + "/gbif_first_records_validation.csv",
         header=0,
         index_col=0,
     )
+
+    # Set up probability by year dictionary keys (column names)
+    sim_years = config["sim_years"]
+    year_probs_dict_keys = []
+    for year in sim_years:
+        year_probs_dict_keys.append(f"prob_by_{year}_{coi}")
+
+    # Set up difference by recorded country dictionary keys (column names)
+    countries_dict_keys = []
+    for ISO3 in validation_df.index:
+        countries_dict_keys.append(f"diff_obs_pred_metric_{ISO3}")
+
     process_pool = multiprocessing.Pool()
     summary_dfs = process_pool.map(compute_stat_wrapper_func, param_samp)
     data = pd.concat(summary_dfs, ignore_index=True)
@@ -46,13 +52,11 @@ if __name__ == "__main__":
             "diff_total_countries_sqrd",
             "count_known_countries_predicted",
             "count_known_countries_time_window",
-            "diff_obs_pred_metric_KOR",
-            "diff_obs_pred_metric_JPN",
-            "diff_obs_pred_metric_USA",
             "diff_obs_pred_metric_mean",
             "diff_obs_pred_metric_stdev",
         ]
         + year_probs_dict_keys
+        + countries_dict_keys
     ]
 
     data["total_countries_intros_predicted"] = data[
@@ -66,9 +70,9 @@ if __name__ == "__main__":
     data["count_known_countries_time_window"] = data[
         "count_known_countries_time_window"
     ].astype(int)
-    data["diff_obs_pred_metric_KOR"] = data["diff_obs_pred_metric_KOR"].astype(float)
-    data["diff_obs_pred_metric_JPN"] = data["diff_obs_pred_metric_JPN"].astype(float)
-    data["diff_obs_pred_metric_USA"] = data["diff_obs_pred_metric_USA"].astype(float)
+    
+    for ISO3 in validation_df.index:
+        data[f"diff_obs_pred_metric_{ISO3}"] = data[f"diff_obs_pred_metric_{ISO3}"].astype(float)
 
     # TP / (TP + FN)
     data["count_known_countries_time_window_recall"] = data[
@@ -102,7 +106,7 @@ if __name__ == "__main__":
     )
 
     data['count_known_countries_time_window_fbeta'] = data.apply(lambda x: fbeta(x['count_known_countries_time_window_precision'],
-                                                                                 x['count_known_countries_time_window_recall'], 2), axis=1)
+                                                                                x['count_known_countries_time_window_recall'], 2), axis=1)
 
     # summary_stat_path = f"{out_dir}/summary_stats/{os.path.split(sim)[-1]}/"
     summary_stat_path = f"{out_dir}/summary_stats/{sim_name}/"
@@ -119,9 +123,6 @@ if __name__ == "__main__":
         "diff_total_countries": ["mean", "std"],
         "diff_total_countries_sqrd": [mse],
         "count_known_countries_time_window": ["mean", "std"],
-        "diff_obs_pred_metric_KOR": ["mean", "std"],
-        "diff_obs_pred_metric_JPN": ["mean", "std"],
-        "diff_obs_pred_metric_USA": ["mean", "std"],
         "diff_obs_pred_metric_mean": ["mean"],
         "diff_obs_pred_metric_stdev": [avg_std],
         "count_known_countries_time_window_recall": ["mean"],
@@ -132,7 +133,11 @@ if __name__ == "__main__":
     prob_agg_dict = dict(
         zip(year_probs_dict_keys, ["mean" for i in range(len(year_probs_dict_keys))])
     )
-    agg_dict = {**agg_dict, **prob_agg_dict}
+    countries_agg_dict = dict(
+        zip(countries_dict_keys, [["mean", "std"] for i in range(len(countries_dict_keys))])
+    )
+
+    agg_dict = {**agg_dict, **prob_agg_dict, **countries_agg_dict}
 
     agg_df = data.groupby("sample").agg(agg_dict)
 
