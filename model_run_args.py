@@ -54,7 +54,7 @@ if __name__ == "__main__":
         stop_year=None,
         save_entry=False,
         save_estab=False,
-        save_intro=False,
+        save_intro=True,
         save_country_intros=False,
         commodity_forecast_path=(
             input_dir + f"/comtrade/trade_forecast/{timestep}_agg/{commodity}"

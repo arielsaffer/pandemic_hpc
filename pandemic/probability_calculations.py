@@ -70,8 +70,10 @@ def probability_of_entry(
         (1 - rho_i)
         * (1 - rho_j)
         * zeta_it
-        * lamda_c
-        * ((T_ijct - min_Tc) / (max_Tc - min_Tc))
+#        * lamda_c  # Testing different options: current formulation
+#        * ((T_ijct - min_Tc) / (max_Tc - min_Tc))
+#        * (1 - math.exp(-lamda_c * (T_ijct - min_Tc) / (max_Tc - min_Tc)) # Original formulation * 4 to constrain lamda to 0 - 1
+        * lamda_c * (1 - (1 - (T_ijct - min_Tc) / (max_Tc - min_Tc))**4) # Quartic - similar curve to above
         * math.exp((-1) * mu * d_ij)
         * chi_it
     )
