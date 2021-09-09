@@ -29,7 +29,7 @@ if __name__ == "__main__":
     threshold_val = config["threshold_val"]
     scaled_min = config["scaled_min"]
     scaled_max = config["scaled_max"]
-
+    timestep = config["timestep"]
     season_dict = config["season_dict"]
 
     commodity = f"{config['start_commodity']}-{config['end_commodity']}"
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     param_vals, config_file_path = create_config_args(
         config_out_path=config_out_path,
-        commodity_path=input_dir + f"/comtrade/monthly_agg/{commodity}",
+        commodity_path=input_dir + f"/comtrade/{timestep}_agg/{commodity}",
         native_countries_list=native_countries_list,
         alpha=alpha,
         mu=0,
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         save_intro=False,
         save_country_intros=False,
         commodity_forecast_path=(
-            input_dir + f"/comtrade/trade_forecast/monthly_agg/{commodity}"
+            input_dir + f"/comtrade/trade_forecast/{timestep}_agg/{commodity}"
         ),
         season_dict=season_dict,
         transmission_lag_type=transmission_lag_type,
