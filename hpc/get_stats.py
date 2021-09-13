@@ -94,16 +94,8 @@ if __name__ == "__main__":
     )
 
     # 2 * (precision * recall / precision + recall)
-    data["count_known_countries_time_window_f1"] = 2 * (
-        (
-            data["count_known_countries_time_window_precision"]
-            * data["count_known_countries_time_window_recall"]
-        )
-        / (
-            data["count_known_countries_time_window_precision"]
-            + data["count_known_countries_time_window_recall"]
-        )
-    )
+    data["count_known_countries_time_window_f1"] = data.apply(lambda x: f1(x['count_known_countries_time_window_precision'],
+                                                                                x['count_known_countries_time_window_recall']), axis=1)
 
     data['count_known_countries_time_window_fbeta'] = data.apply(lambda x: fbeta(x['count_known_countries_time_window_precision'],
                                                                                 x['count_known_countries_time_window_recall'], 2), axis=1)

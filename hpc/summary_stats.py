@@ -222,4 +222,12 @@ def fbeta(precision, recall, weight):
             (weight ** 2) * precision + recall
         )
     else:
-        return np.nan
+        return 0
+
+def f1(precision, recall):
+    if (precision != 0) and (recall != 0):
+        return (2 * precision * recall) / (
+            precision + recall
+        )
+    else:
+        return 0
