@@ -3,7 +3,7 @@ import os
 project_loc = os.getcwd()
 input = "/inputs"
 output = "/outputs"
-countries_file = "/countries_hiiMask16.gpkg"
+countries_file = "/countries.gpkg"
 
 with open(".env", "w") as f:
     f.write(f"DATA_PATH='{project_loc}'\n")

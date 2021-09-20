@@ -22,6 +22,12 @@ cd pandemic_hpc
 ```
 Run the [Pandemic Data Acquisition notebook](https://github.com/ncsu-landscape-dynamics/Pandemic_Model/blob/master/notebooks/1_data_acquisition_format.ipynb) locally and copy to the "inputs" directory.
 
+So that you don't need to edit file names within the scripts, name input files as follows:
+ - countries.gpkg
+ - climate_similarities.npy
+ - distance_matrix.npy
+ - first_records_validation.csv
+
 Use nano to modify model parameters in 'global_config.py'. 
 ```
 nano global_config.py

@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     param_samp = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")
     validation_df = pd.read_csv(
-        input_dir + "/gbif_first_records_validation.csv",
+        input_dir + "/first_records_validation.csv",
         header=0,
         index_col=0,
     )
