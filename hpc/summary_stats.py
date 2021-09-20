@@ -137,7 +137,7 @@ def compute_stat_wrapper_func(param_sample):
     sim_years = config["sim_years"]
 
     validation_df = pd.read_csv(
-        input_dir + "/gbif_first_records_validation.csv",
+        input_dir + "/first_records_validation.csv",
         header=0,
         index_col=0,
     )
