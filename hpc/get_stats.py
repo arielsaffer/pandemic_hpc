@@ -4,7 +4,7 @@ import pandas as pd
 import multiprocessing
 from dotenv import load_dotenv
 import json
-from summary_stats import compute_stat_wrapper_func, mse, fbeta, avg_std
+from summary_stats import compute_stat_wrapper_func, mse, f1, fbeta, avg_std
 
 if __name__ == "__main__":
     load_dotenv(os.path.join(".env"))
