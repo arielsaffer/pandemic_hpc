@@ -4,38 +4,64 @@ from hpc.create_config_params import create_global_config_args
 from dotenv import load_dotenv
 
 # Model parameters
-sim_name = "mln_monthly_wUSA"
+sim_name = "tobrfv_monthly_revEstabEq"
 start_run = 0
-end_run = 50
-start_commodity = 100590
-end_commodity = 230210
-country_of_interest = "Kenya"
-native_countries_list = ["Peru", "Argentina", "Mexico", "Thailand", "Colombia","United States"]
+end_run = 10
+start_commodity = "0702"
+end_commodity = "120991"
+country_of_interest = "Mexico"
+native_countries_list = ["Israel", "Jordan"]
 
 # To keep one parameter static, pass it as a list e.g. alpha = [0.15]
-start_years = list(range(2000, 2010))
-alphas = [round(a, 2) for a in list(np.arange(0.15, 0.36, 0.05))]
-lamdas = [round(l, 2) for l in list(np.arange(1.0, 4.1, 0.05))]
+start_years = list(range(2012, 2014))
+alphas = [round(a, 2) for a in list(np.arange(0.25, 0.55, 0.1))]
+lamdas = [round(l, 2) for l in list(np.arange(0.4, 2, 0.2))]
 
 # Transmission lag type
 transmission_lag_type = "stochastic"
-gamma_shape = 4
+gamma_shape = 2
 gamma_scale = 1
 threshold_val = 16
 scaled_min = 0.3
 scaled_max = 0.8
 
 season_dict = {
-    "NH_season": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
-    "SH_season": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+    "NH_season": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+    ],
+    "SH_season": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+    ],
 }
 
 timestep = "monthly"
 
 # Summary statistics
-years_before_firstRecord = 5
+years_before_firstRecord = 10
 years_after_firstRecord = 1
-end_valid_year = 2018
+end_valid_year = 2020
 sim_years = [2014, 2020]  # list(range(2006,2035))
 
 load_dotenv(os.path.join(".env"))
@@ -64,5 +90,5 @@ create_global_config_args(
     years_before_firstRecord,
     years_after_firstRecord,
     end_valid_year,
-    sim_years
+    sim_years,
 )

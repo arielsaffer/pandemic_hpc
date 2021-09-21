@@ -49,7 +49,7 @@ if __name__ == "__main__":
         mu=0,
         lamda_c_list=lamda_c_list,
         phi=1,
-        w_phi=1,
+        w_phi=2,
         start_year=start_year,
         stop_year=None,
         save_entry=False,
