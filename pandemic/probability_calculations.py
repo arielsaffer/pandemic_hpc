@@ -135,9 +135,9 @@ def probability_of_establishment(
         (-1)
         * beta
         * (
-            ((1 - delta_kappa_ijt / sigma_kappa) ** 2)
-            + ((1 - h_jt / sigma_h) ** 2)
-            + ((phi / w_phi) ** (-2))
+            ((1 - delta_kappa_ijt) / sigma_kappa) ** 2
+            + ((1 - h_jt) / sigma_h) ** 2
+            + (w_phi / phi) ** (-2)
         )
     )
 
