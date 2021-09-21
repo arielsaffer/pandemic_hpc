@@ -232,32 +232,18 @@ def pandemic_single_time_step(
             if T_ijct == 0:
                 probability_of_entry_ijct = 0
             else:
-                if len(time_step) == 4:
-                    probability_of_entry_ijct = (1 - (1 - probability_of_entry(
-                        rho_i,
-                        rho_j,
-                        zeta_it,
-                        lamda_c,
-                        T_ijct,
-                        min_Tc,
-                        max_Tc,
-                        mu,
-                        d_ij,
-                        chi_it,
-                    ))**12)
-                else: 
-                    probability_of_entry_ijct = probability_of_entry(
-                        rho_i,
-                        rho_j,
-                        zeta_it,
-                        lamda_c,
-                        T_ijct,
-                        min_Tc,
-                        max_Tc,
-                        mu,
-                        d_ij,
-                        chi_it,
-                    )
+                probability_of_entry_ijct = probability_of_entry(
+                    rho_i,
+                    rho_j,
+                    zeta_it,
+                    lamda_c,
+                    T_ijct,
+                    min_Tc,
+                    max_Tc,
+                    mu,
+                    d_ij,
+                    chi_it,
+                )
             if len(time_step) == 4:
                 probability_of_establishment_ijt = (1 - (1 - probability_of_establishment(
                 alpha,
