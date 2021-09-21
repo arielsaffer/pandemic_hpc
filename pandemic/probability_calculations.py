@@ -70,10 +70,12 @@ def probability_of_entry(
         (1 - rho_i)
         * (1 - rho_j)
         * zeta_it
-#        * lamda_c  # Testing different options: current formulation
-#        * ((T_ijct - min_Tc) / (max_Tc - min_Tc))
-        * (1 - math.exp(-lamda_c * (T_ijct - min_Tc) / (max_Tc - min_Tc))) # Original formulation * 4 to constrain lamda to 0 - 1
-#        * lamda_c * (1 - (1 - (T_ijct - min_Tc) / (max_Tc - min_Tc))**4) # Quartic - similar curve to above
+        #        * lamda_c  # Testing different options: current formulation
+        #        * ((T_ijct - min_Tc) / (max_Tc - min_Tc))
+        * (
+            1 - math.exp(-lamda_c * (T_ijct - min_Tc) / (max_Tc - min_Tc))
+        )  # Original formulation * 4 to constrain lamda to 0 - 1
+        #        * lamda_c * (1 - (1 - (T_ijct - min_Tc) / (max_Tc - min_Tc))**4) # Quartic - similar curve to above
         * math.exp((-1) * mu * d_ij)
         * chi_it
     )
@@ -129,14 +131,13 @@ def probability_of_establishment(
         from the probability_of_establishment and probability_of_entry
     """
 
-    return (
-        phi
-        * w_phi
-        * alpha
-        * math.exp(
-            (-1)
-            * beta
-            * (((delta_kappa_ijt / sigma_kappa) ** 2) + ((h_jt / sigma_h) ** 2))
+    return alpha * math.exp(
+        (-1)
+        * beta
+        * (
+            ((1 - delta_kappa_ijt / sigma_kappa) ** 2)
+            + ((1 - h_jt / sigma_h) ** 2)
+            + ((phi / w_phi) ** (-2))
         )
     )
 
