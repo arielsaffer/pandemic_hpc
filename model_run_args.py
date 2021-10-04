@@ -32,7 +32,7 @@ if __name__ == "__main__":
     timestep = config["timestep"]
     season_dict = config["season_dict"]
 
-    commodity = f"{config['start_commodity']}-{config['end_commodity']}"
+    commodity = f"{config['commodity_list']}"
 
     config_out_path = (
         rf"{os.getcwd()}"

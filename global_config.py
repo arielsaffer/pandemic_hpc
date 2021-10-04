@@ -7,8 +7,9 @@ from dotenv import load_dotenv
 sim_name = "tobrfv_monthly_revEstabEq"
 start_run = 0
 end_run = 10
-start_commodity = "0702"
-end_commodity = "120991"
+# start_commodity = "0702"
+# end_commodity = "120991"
+commodity_list = ["0702", "120991", "070960"]
 country_of_interest = "Mexico"
 native_countries_list = ["Israel", "Jordan"]
 
@@ -72,8 +73,7 @@ create_global_config_args(
     sim_name,
     start_run,
     end_run,
-    start_commodity,
-    end_commodity,
+    commodity_list,
     country_of_interest,
     native_countries_list,
     start_years,

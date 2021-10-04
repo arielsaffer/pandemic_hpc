@@ -78,8 +78,8 @@ def compute_summary_stats(
     total_intros_diff = validation_df.shape[0] - total_intros_predicted
     total_intros_diff_sqrd = total_intros_diff ** 2
 
-    # Compute prob of introduction happening at least once in country of interest
-    # for each year in simulation
+    # Compute prob of introduction happening at least once in
+    # country of interest for each year in simulation
     year_probs_dict_values = []
     for year in sim_years:
         prob_cols = [
@@ -117,7 +117,7 @@ def compute_summary_stats(
             "obs-pred_metric"
         ].std(),
     }
-    
+
     summary_stats_dict = {**summary_stats_dict, **year_probs_dict, **countries_dict}
 
     return model_output, summary_stats_dict

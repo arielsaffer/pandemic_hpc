@@ -28,7 +28,12 @@ def complete_run_check(param_sample):
             runs.append(int(indiv))
         for run in runs:
             completed_runs = completed_runs.append(
-                pd.Series({"start": start, "alpha": alpha, "lamda": lamda, "run": run}),
+                pd.Series({
+                    "start": start,
+                    "alpha": alpha,
+                    "lamda": lamda,
+                    "run": run
+                }),
                 ignore_index=True,
             )
     # Write it to a .csv for safe keeping
@@ -88,7 +93,7 @@ if __name__ == "__main__":
     with open("config.json") as json_file:
         config = json.load(json_file)
     sim_name = config["sim_name"]
-    commodity = f"{config['start_commodity']}-{config['end_commodity']}"
+    commodity = f"{config['commodidty_list']}"
 
     # Call the folders
     param_sample = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")

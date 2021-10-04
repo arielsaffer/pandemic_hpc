@@ -1,12 +1,14 @@
 import json
 
+
 def create_global_config_args(
     project_loc,
     sim_name,
     start_run,
     end_run,
-    start_commodity,
-    end_commodity,
+    commodity_list,
+    # start_commodity,
+    # end_commodity,
     country_of_interest,
     native_countries_list,
     start_years,
@@ -33,8 +35,9 @@ def create_global_config_args(
     args["sim_name"] = sim_name
     args["start_run"] = start_run
     args["end_run"] = end_run
-    args["start_commodity"] = start_commodity
-    args["end_commodity"] = end_commodity
+    args['commodity_list'] = commodity_list
+    # args["start_commodity"] = start_commodity
+    # args["end_commodity"] = end_commodity
     args["country_of_interest"] = country_of_interest
     args["native_countries_list"] = native_countries_list
     args["start_years"] = start_years
