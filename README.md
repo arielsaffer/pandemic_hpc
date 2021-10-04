@@ -42,6 +42,9 @@ bsub < submit_setup.csh
 Modify or copy 'submit_launch.csh' to adjust the resources requested (especially -n and -W). If you are in the landscape-dynamics lab group, the conda environment has already been created on HPC and is referenced in 'submit_launch.csh'. If you are not, the conda commands to set it up are included below.
 
 Submit the script.
+```
+bsub < submit_launch.csh 
+```
 
 Once your job is complete, if it finished without error, you can calculate the summary statistics. If the job was cut short by the time limit, you may need to resume runs. To check which runs were completed and write out commands for missing runs, adjust and submit 'submit_check.csh', which will run 'run_checker,py'. 
 
