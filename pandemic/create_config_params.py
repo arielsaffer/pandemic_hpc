@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def create_config_args(
     config_out_path,
     commodity_path,
@@ -48,9 +49,9 @@ def create_config_args(
     args["transmission_lag_unit"] = "year"
     # Transmission lag type can be static, stochastic or none
     args["transmission_lag_type"] = transmission_lag_type
-    args["time_to_infectivity"] = time_to_infectivity  # only for lag type static
-    args["transmission_lag_shape"] = gamma_shape  # only for lag type stochastic
-    args["transmission_lag_scale"] = gamma_scale  # only for lag type stochastic
+    args["time_to_infectivity"] = time_to_infectivity  # only lag == static
+    args["transmission_lag_shape"] = gamma_shape  # only lag == stochastic
+    args["transmission_lag_scale"] = gamma_scale  # only lag == stochastic
     args["random_seed"] = random_seed
     args["save_main_output"] = save_main_output
     args["save_metadata"] = save_metadata

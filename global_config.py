@@ -16,10 +16,10 @@ native_countries_list = ["Israel", "Jordan"]
 # To keep one parameter static, pass it as a list e.g. alpha = [0.15]
 start_years = list(range(2012, 2014))
 alphas = [round(a, 2) for a in list(np.arange(0.25, 0.55, 0.1))]
-lamdas = [round(l, 2) for l in list(np.arange(0.4, 2, 0.2))]
+lamdas = [round(l, 2) for l in list(np.arange(0.2, 3, 0.2))]
 
 # Transmission lag type
-transmission_lag_type = "stochastic"
+transmission_lag_type = None
 gamma_shape = 2
 gamma_scale = 1
 threshold_val = 16
@@ -63,7 +63,7 @@ timestep = "monthly"
 years_before_firstRecord = 10
 years_after_firstRecord = 1
 end_valid_year = 2020
-sim_years = [2014, 2020]  # list(range(2006,2035))
+sim_years = [2014, 2023]  # list(range(2006,2035))
 
 load_dotenv(os.path.join(".env"))
 project_loc = os.getenv("DATA_PATH")

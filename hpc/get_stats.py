@@ -15,7 +15,8 @@ if __name__ == "__main__":
     with open("config.json") as json_file:
         config = json.load(json_file)
     sim_name = config["sim_name"]
-    commodity = f"{config['commodity_list']}"
+    commodity = '-'.join(str(elem) for elem in config["commodity_list"])
+
     coi = config["country_of_interest"]
     native_countries_list = config["native_countries_list"]
 

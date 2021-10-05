@@ -75,6 +75,7 @@ for f in file_list_filtered:
     ts = str.split(os.path.splitext(fn)[0], "_")[-1]
     date_list.append(ts)
 date_list.sort()
+print(date_list)
 end_sim_year = date_list[-1][:4]
 
 # Example trade array for formatting outputs
