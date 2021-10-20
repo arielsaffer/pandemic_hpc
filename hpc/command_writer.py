@@ -3,6 +3,7 @@ import json
 
 # Name the script to be run
 model_script = "model_run_args.py"
+temp_script = "./hpc/wrapper_script.csh"
 
 with open("config.json") as json_file:
     config = json.load(json_file)
@@ -27,7 +28,7 @@ if model_files == "Temp":
         output = (
             " ".join(
                 [
-                    "hpc/wrapper_script.csh",
+                    temp_script,
                     str(params[0]),
                     str(params[1]),
                     str(params[2]),
@@ -37,6 +38,7 @@ if model_files == "Temp":
             )
             + "\n"
         )
+        file1.write(output)
 
 else:
     for params in param_sets:
@@ -54,5 +56,6 @@ else:
             )
             + "\n"
         )
-    file1.write(output)
+        file1.write(output)
+
 file1.close()

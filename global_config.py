@@ -9,7 +9,7 @@ model_files = "Temp" # "Keep" or "Temp"
 # Model parameters
 sim_name = "mln_eqn_test"
 start_run = 0
-end_run = 50
+end_run = 5
 start_commodity = 100510
 end_commodity = 100590
 country_of_interest = "KEN"
@@ -45,6 +45,7 @@ load_dotenv(os.path.join(".env"))
 project_loc = os.getenv("DATA_PATH")
 
 create_global_config_args(
+    model_files,
     project_loc,
     sim_name,
     start_run,
