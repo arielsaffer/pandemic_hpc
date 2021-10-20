@@ -3,25 +3,28 @@ import os
 from hpc.create_config_params import create_global_config_args
 from dotenv import load_dotenv
 
+# Save model outputs? (Keep = save all model files; Temp = write temporary model files, save only summary statistics)
+model_files = "Temp" # "Keep" or "Temp"
+
 # Model parameters
-sim_name = "mln_monthly_wUSA"
+sim_name = "mln_eqn_test"
 start_run = 0
 end_run = 50
-start_commodity = 100590
-end_commodity = 230210
-country_of_interest = "Kenya"
+start_commodity = 100510
+end_commodity = 100590
+country_of_interest = "KEN"
 native_countries_list = ["Peru", "Argentina", "Mexico", "Thailand", "Colombia","United States"]
 
 # To keep one parameter static, pass it as a list e.g. alpha = [0.15]
 start_years = list(range(2000, 2010))
-alphas = [round(a, 2) for a in list(np.arange(0.15, 0.36, 0.05))]
-lamdas = [round(l, 2) for l in list(np.arange(1.0, 4.1, 0.05))]
+alphas = [round(a, 2) for a in list(np.arange(0.05, 1, 0.1))]
+lamdas = [round(l, 2) for l in list(np.arange(0.05, 1, 0.1))]
 
 # Transmission lag type
 transmission_lag_type = "stochastic"
-gamma_shape = 4
-gamma_scale = 1
-threshold_val = 16
+gamma_shape = 1
+gamma_scale = 0.5
+threshold_val = ""
 scaled_min = 0.3
 scaled_max = 0.8
 
@@ -30,7 +33,7 @@ season_dict = {
     "SH_season": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
 }
 
-timestep = "monthly"
+timestep = "annual"
 
 # Summary statistics
 years_before_firstRecord = 5

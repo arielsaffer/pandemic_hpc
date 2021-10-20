@@ -14,12 +14,11 @@ if __name__ == "__main__":
         int(sys.argv[4]),
         int(sys.argv[5]),
     ]
-    load_dotenv(os.path.join(".env"))
-    input_dir = os.getenv("INPUT_PATH")
-    out_dir = os.getenv("OUTPUT_PATH")
 
     with open("config.json") as json_file:
         config = json.load(json_file)
+    
+    model_files = config["model_files"]
     sim_name = config["sim_name"]
     native_countries_list = config["native_countries_list"]
 
@@ -33,6 +32,13 @@ if __name__ == "__main__":
     season_dict = config["season_dict"]
 
     commodity = f"{config['start_commodity']}-{config['end_commodity']}"
+
+    load_dotenv(os.path.join(".env"))
+    input_dir = os.getenv("INPUT_PATH")
+    if model_files == "Temp":
+        out_dir = sys.argv[6]
+    else:
+        out_dir = os.getenv("OUTPUT_PATH")
 
     config_out_path = (
         rf"{os.getcwd()}"
