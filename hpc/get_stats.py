@@ -1,3 +1,4 @@
+import sys
 import os
 import glob
 import pandas as pd
@@ -16,21 +17,20 @@ if __name__ == "__main__":
     native_countries_list = config["native_countries_list"]
     model_files = config["model_files"]
 
-
     load_dotenv(os.path.join(".env"))
     data_dir = os.getenv("DATA_PATH")
     input_dir = os.getenv("INPUT_PATH")
 
     if model_files == "Temp":
-        out_dir = sys.argv[1]
+        out_dir = (
+            f'{os.getenv("TEMP_OUTPATH")}/samp{sys.argv[1]}_{sys.argv[2]}_{sys.argv[3]}'
+        )
     else:
         out_dir = os.getenv("OUTPUT_PATH")
 
     param_samp = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")
     validation_df = pd.read_csv(
-        input_dir + "/first_records_validation.csv",
-        header=0,
-        index_col=0,
+        input_dir + "/first_records_validation.csv", header=0, index_col=0,
     )
 
     # Set up probability by year dictionary keys (column names)
@@ -77,9 +77,11 @@ if __name__ == "__main__":
     data["count_known_countries_time_window"] = data[
         "count_known_countries_time_window"
     ].astype(int)
-    
+
     for ISO3 in validation_df.index:
-        data[f"diff_obs_pred_metric_{ISO3}"] = data[f"diff_obs_pred_metric_{ISO3}"].astype(float)
+        data[f"diff_obs_pred_metric_{ISO3}"] = data[
+            f"diff_obs_pred_metric_{ISO3}"
+        ].astype(float)
 
     # TP / (TP + FN)
     data["count_known_countries_time_window_recall"] = data[
@@ -101,11 +103,22 @@ if __name__ == "__main__":
     )
 
     # 2 * (precision * recall / precision + recall)
-    data["count_known_countries_time_window_f1"] = data.apply(lambda x: f1(x['count_known_countries_time_window_precision'],
-                                                                                x['count_known_countries_time_window_recall']), axis=1)
+    data["count_known_countries_time_window_f1"] = data.apply(
+        lambda x: f1(
+            x["count_known_countries_time_window_precision"],
+            x["count_known_countries_time_window_recall"],
+        ),
+        axis=1,
+    )
 
-    data['count_known_countries_time_window_fbeta'] = data.apply(lambda x: fbeta(x['count_known_countries_time_window_precision'],
-                                                                                x['count_known_countries_time_window_recall'], 2), axis=1)
+    data["count_known_countries_time_window_fbeta"] = data.apply(
+        lambda x: fbeta(
+            x["count_known_countries_time_window_precision"],
+            x["count_known_countries_time_window_recall"],
+            2,
+        ),
+        axis=1,
+    )
 
     # summary_stat_path = f"{out_dir}/summary_stats/{os.path.split(sim)[-1]}/"
     summary_stat_path = f'{os.getenv("OUTPUT_PATH")}/summary_stats/{sim_name}/'
@@ -113,16 +126,26 @@ if __name__ == "__main__":
         os.makedirs(summary_stat_path)
     # data.to_csv(summary_stat_path + "/summary_stats_wPrecisionRecallF1FBetaAggProb.csv")
 
-    if os.path.isfile(summary_stat_path + "/summary_stats_wPrecisionRecallF1FBetaAggProb.csv"):
-        agg_df.to_csv(summary_stat_path + "/summary_stats_wPrecisionRecallF1FBetaAggProb.csv", mode='a', index=False, header=False)
+    if os.path.isfile(
+        summary_stat_path + "/summary_stats_wPrecisionRecallF1FBetaAggProb.csv"
+    ):
+        data.to_csv(
+            summary_stat_path + "/summary_stats_wPrecisionRecallF1FBetaAggProb.csv",
+            mode="a",
+            index=False,
+            header=False,
+        )
     else:
-        agg_df.to_csv(summary_stat_path + "/summary_stats_wPrecisionRecallF1FBetaAggProb.csv", index= False)
+        data.to_csv(
+            summary_stat_path + "/summary_stats_wPrecisionRecallF1FBetaAggProb.csv",
+            index=False,
+        )
 
     process_pool.close()
 
     agg_dict = {
-        "start":["max"],
-        "alpha":["max"],
+        "start": ["max"],
+        "alpha": ["max"],
         "lamda": ["max"],
         "total_countries_intros_predicted": ["mean", "std"],
         "diff_total_countries": ["mean", "std"],
@@ -133,13 +156,16 @@ if __name__ == "__main__":
         "count_known_countries_time_window_recall": ["mean"],
         "count_known_countries_time_window_precision": ["mean"],
         "count_known_countries_time_window_f1": ["mean"],
-        "count_known_countries_time_window_fbeta": ["mean"]
+        "count_known_countries_time_window_fbeta": ["mean"],
     }
     prob_agg_dict = dict(
         zip(year_probs_dict_keys, ["mean" for i in range(len(year_probs_dict_keys))])
     )
     countries_agg_dict = dict(
-        zip(countries_dict_keys, [["mean", "std"] for i in range(len(countries_dict_keys))])
+        zip(
+            countries_dict_keys,
+            [["mean", "std"] for i in range(len(countries_dict_keys))],
+        )
     )
 
     agg_dict = {**agg_dict, **prob_agg_dict, **countries_agg_dict}
@@ -150,6 +176,11 @@ if __name__ == "__main__":
     # agg_df.to_csv(summary_stat_path + "/summary_stats_bySample.csv")
 
     if os.path.isfile(summary_stat_path + "/summary_stats_bySample.csv"):
-        agg_df.to_csv(summary_stat_path + "/summary_stats_bySample.csv", mode='a', index=False, header=False)
+        agg_df.to_csv(
+            summary_stat_path + "/summary_stats_bySample.csv",
+            mode="a",
+            index=False,
+            header=False,
+        )
     else:
-        agg_df.to_csv(summary_stat_path + "/summary_stats_bySample.csv", index= False)
+        agg_df.to_csv(summary_stat_path + "/summary_stats_bySample.csv", index=False)
