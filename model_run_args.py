@@ -14,12 +14,11 @@ if __name__ == "__main__":
         int(sys.argv[4]),
         int(sys.argv[5]),
     ]
-    load_dotenv(os.path.join(".env"))
-    input_dir = os.getenv("INPUT_PATH")
-    out_dir = os.getenv("OUTPUT_PATH")
 
     with open("config.json") as json_file:
         config = json.load(json_file)
+
+    model_files = config["model_files"]
     sim_name = config["sim_name"]
     native_countries_list = config["native_countries_list"]
 
@@ -34,9 +33,16 @@ if __name__ == "__main__":
 
     commodity = f"{config['start_commodity']}-{config['end_commodity']}"
 
+    load_dotenv(os.path.join(".env"))
+    input_dir = os.getenv("INPUT_PATH")
+
+    if model_files == "Temp":
+        out_dir = f"{os.getenv("TEMP_OUTPATH")}/samp{alpha}_{lamda_c_list[0]}_{start_year}"
+    else:
+        out_dir = os.getenv("OUTPUT_PATH")
+
     config_out_path = (
-        rf"{os.getcwd()}"
-        rf"/outputs/config_files/"
+        rf"{out_dir}/"
         rf"year{start_year}_alpha{alpha}_lamda{lamda_c_list[0]}"
         rf"_{commodity}/config.json"
     )

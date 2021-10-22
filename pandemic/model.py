@@ -16,13 +16,6 @@ from output_files import (
     write_model_metadata,
 )
 
-# Read environmental variables
-load_dotenv(os.path.join(".env"))
-data_dir = os.getenv("DATA_PATH")
-input_dir = os.getenv("INPUT_PATH")
-out_dir = os.getenv("OUTPUT_PATH")
-countries_path = os.getenv("COUNTRIES_PATH")
-
 # Read pandemic arguments from configuration file
 path_to_config_json = sys.argv[1]
 with open(path_to_config_json) as json_file:
@@ -54,6 +47,23 @@ save_entry = config["save_entry"]
 save_estab = config["save_estab"]
 save_intro = config["save_intro"]
 save_country_intros = config["save_country_intros"]
+
+with open("config.json") as json_file:
+    config = json.load(json_file)
+
+model_files = config["model_files"]
+
+# Read environmental variables
+load_dotenv(os.path.join(".env"))
+data_dir = os.getenv("DATA_PATH")
+input_dir = os.getenv("INPUT_PATH")
+
+if model_files == "Temp":
+    out_dir = f'{os.getenv("TEMP_OUTPATH")}/samp{alpha}_{lamda_c_list[0]}_{start_year}'
+else:
+    out_dir = os.getenv("OUTPUT_PATH")
+
+countries_path = os.getenv("COUNTRIES_PATH")
 
 countries = geopandas.read_file(countries_path, driver="GPKG")
 distances = np.load(input_dir + "/distance_matrix.npy")

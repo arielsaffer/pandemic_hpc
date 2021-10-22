@@ -1,6 +1,7 @@
 import json
 
 def create_global_config_args(
+    model_files,
     project_loc,
     sim_name,
     start_run,
@@ -29,6 +30,7 @@ def create_global_config_args(
     args = {}
 
     # Directory and file paths
+    args["model_files"] = model_files
     args["project_loc"] = project_loc
     args["sim_name"] = sim_name
     args["start_run"] = start_run
