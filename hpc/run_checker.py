@@ -92,7 +92,7 @@ def run_checker(param_sample):
                 & (param_sample["alpha_max"] == alpha)
             ]
             if len(completed.index) == 0:
-                pending_runs.append([param_set, set(start_run, end_run)])
+                pending_runs.append([param_set, set([start_run, end_run])])
 
     return pending_runs
 
@@ -119,7 +119,6 @@ if __name__ == "__main__":
         param_sample = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")
 
     # Call the folders
-    param_sample = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")
     pending_runs = run_checker(param_sample)
 
     file1 = open("pending_runs.txt", "w")
