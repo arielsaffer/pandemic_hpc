@@ -57,9 +57,10 @@ model_files = config["model_files"]
 load_dotenv(os.path.join(".env"))
 data_dir = os.getenv("DATA_PATH")
 input_dir = os.getenv("INPUT_PATH")
+temp_dir = os.getenv("TEMP_OUTPATH")
 
 if model_files == "Temp":
-    out_dir = f'{os.getenv("TEMP_OUTPATH")}/samp{alpha}_{lamda_c_list[0]}_{start_year}'
+    out_dir = f"{temp_dir}/samp{alpha}_{lamda_c_list[0]}_{start_year}"
 else:
     out_dir = os.getenv("OUTPUT_PATH")
 
