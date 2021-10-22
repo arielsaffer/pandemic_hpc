@@ -43,7 +43,7 @@ if __name__ == "__main__":
         out_dir = os.getenv("OUTPUT_PATH")
 
     config_out_path = (
-        rf"{out_dir}/"
+        rf"{out_dir}/config/"
         rf"year{start_year}_alpha{alpha}_lamda{lamda_c_list[0]}"
         rf"_{commodity}/config.json"
     )
