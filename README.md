@@ -39,7 +39,7 @@ To set up the environment and write the commands that will be run, submit (1) hp
 bsub < submit_setup.csh 
 ```
 
-Modify or copy 'submit_launch.csh' to adjust the resources requested (especially -n and -W). If you are in the landscape-dynamics lab group, the conda environment has already been created on HPC and is referenced in 'submit_launch.csh'. If you are not, the conda commands to set it up are included below.
+Modify or copy 'submit_launch.csh' to adjust the resources requested (especially -n and -W). If you are in the landscape-dynamics lab group, the conda environment has already been created on HPC and is referenced in 'submit_launch.csh'. If you are not, the conda commands to set it up are included below. *Note: If you will write output to temporary files, run the command ```chmod u+x wrapper_script.csh``` before your first use to give permission to execute the wrapper script.*
 
 Submit the script.
 
