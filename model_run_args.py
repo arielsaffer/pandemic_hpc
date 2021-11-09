@@ -7,12 +7,13 @@ from pandemic.create_config_params import create_config_args
 from hpc.multiple_runs import create_params, execute_model_runs
 
 if __name__ == "__main__":
-    alpha, lamda_c_list, start_year, start_run, num_runs = [
+    alpha, beta, lamda_c_list, start_year, start_run, num_runs = [
         float(sys.argv[1]),
-        [float(sys.argv[2])],
-        int(sys.argv[3]),
+        float(sys.argv[2])
+        [float(sys.argv[3])],
         int(sys.argv[4]),
         int(sys.argv[5]),
+        int(sys.argv[6]),
     ]
     load_dotenv(os.path.join(".env"))
     input_dir = os.getenv("INPUT_PATH")
@@ -31,13 +32,16 @@ if __name__ == "__main__":
     scaled_max = config["scaled_max"]
     timestep = config["timestep"]
     season_dict = config["season_dict"]
+    lamda_weights_path = config["lamda_weights_path"]
 
     commodity = '-'.join(str(elem) for elem in config["commodity_list"])
 
     config_out_path = (
         rf"{os.getcwd()}"
         rf"/outputs/config_files/"
-        rf"year{start_year}_alpha{alpha}_lamda{lamda_c_list[0]}"
+        rf"year{start_year}_alpha{alpha}"
+        rf"_beta{beta}"
+        rf"_lamda{lamda_c_list[0]}"
         rf"_{commodity}/config.json"
     )
 
@@ -46,10 +50,11 @@ if __name__ == "__main__":
         commodity_path=input_dir + f"/comtrade/{timestep}_agg/{commodity}",
         native_countries_list=native_countries_list,
         alpha=alpha,
+        beta=beta,
         mu=0,
         lamda_c_list=lamda_c_list,
         phi=1,
-        w_phi=2,
+        w_phi=1,
         start_year=start_year,
         stop_year=None,
         save_entry=False,
@@ -62,10 +67,11 @@ if __name__ == "__main__":
         season_dict=season_dict,
         transmission_lag_type=transmission_lag_type,
         time_to_infectivity=None,
-        gamma_shape=gamma_shape,
-        gamma_scale=gamma_scale,
-        random_seed=None,
+        gamma_shape=None,
+        gamma_scale=None,
+        random_seed=50,
         cols_to_drop=None,
+        lamda_weights_path=lamda_weights_path,
     )
 
     param_list = create_params(
@@ -75,6 +81,7 @@ if __name__ == "__main__":
         add_descript=(
             rf"year{param_vals['start_year']}_"
             rf"alpha{param_vals['alpha']}_"
+            rf"beta{param_vals['beta']}_"
             rf"lamda{param_vals['lamda_c_list'][0]}"
         ),
         iteration_start=start_run,

@@ -93,4 +93,5 @@ create_global_config_args(
     end_valid_year,
     sim_years,
     lamda_weights_path,
+    cols_to_drop=None,
 )
