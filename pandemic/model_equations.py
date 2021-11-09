@@ -26,6 +26,7 @@ from probability_calculations import (
 
 from helpers import location_pairs_with_host, adjust_trade_scenario
 
+
 def pandemic_single_time_step(
     trade,
     distances,
@@ -188,14 +189,13 @@ def pandemic_single_time_step(
                 time_step_year = int(time_step[:4])
             elif len(time_step) == 4:
                 time_step_year = int(time_step)
-            scenario = (
-                [
-                    item for item in scenario_list
-                    if item[0] == time_step_year
-                    and item[1] == origin["ISO3"]
-                    and item[2] == destination["ISO3"]
-                ]
-            )
+            scenario = [
+                item
+                for item in scenario_list
+                if item[0] == time_step_year
+                and item[1] == origin["ISO3"]
+                and item[2] == destination["ISO3"]
+            ]
             if len(scenario) == 1:
                 print(f"\tAdjusting trade for {origin['ISO3']}-{destination['ISO3']}")
                 print(f"\t\tfrom: {T_ijct}")
@@ -245,14 +245,7 @@ def pandemic_single_time_step(
                     chi_it,
                 )
             probability_of_establishment_ijt = probability_of_establishment(
-                alpha,
-                beta,
-                delta_kappa_ijt,
-                sigma_kappa,
-                h_jt,
-                sigma_h,
-                phi,
-                w_phi,
+                alpha, beta, delta_kappa_ijt, sigma_kappa, h_jt, sigma_h, phi, w_phi,
             )
         else:
             zeta_it = 0
@@ -267,7 +260,7 @@ def pandemic_single_time_step(
         introduction_probabilities[j, i] = probability_of_introduction_ijtc
 
         # decide if an introduction happens
-        if len(time_step)==4:
+        if len(time_step) == 4:
             introduced = np.random.binomial(12, probability_of_introduction_ijtc)
         else:
             introduced = np.random.binomial(1, probability_of_introduction_ijtc)

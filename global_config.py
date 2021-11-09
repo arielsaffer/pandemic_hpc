@@ -4,16 +4,26 @@ from hpc.create_config_params import create_global_config_args
 from dotenv import load_dotenv
 
 # Save model outputs? (Keep = save all model files; Temp = write temporary model files, save only summary statistics)
-model_files = "Temp" # "Keep" or "Temp"
+model_files = "Temp"  # "Keep" or "Temp"
+
+# Print out model run time steps (True recommended for HPC/large #'s of runs)
+quiet_time = True  # True or False
 
 # Model parameters
 sim_name = "mln_eqn_test"
 start_run = 0
 end_run = 5
 start_commodity = 100510
-end_commodity = 100590
+end_commodity = 100510
 country_of_interest = "KEN"
-native_countries_list = ["Peru", "Argentina", "Mexico", "Thailand", "Colombia","United States"]
+native_countries_list = [
+    "Peru",
+    "Argentina",
+    "Mexico",
+    "Thailand",
+    "Colombia",
+    "United States",
+]
 
 # To keep one parameter static, pass it as a list e.g. alpha = [0.15]
 start_years = list(range(2000, 2010))
@@ -29,8 +39,34 @@ scaled_min = 0.3
 scaled_max = 0.8
 
 season_dict = {
-    "NH_season": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
-    "SH_season": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+    "NH_season": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+    ],
+    "SH_season": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+    ],
 }
 
 timestep = "annual"
@@ -46,6 +82,7 @@ project_loc = os.getenv("DATA_PATH")
 
 create_global_config_args(
     model_files,
+    quiet_time,
     project_loc,
     sim_name,
     start_run,
@@ -68,5 +105,5 @@ create_global_config_args(
     years_before_firstRecord,
     years_after_firstRecord,
     end_valid_year,
-    sim_years
+    sim_years,
 )
