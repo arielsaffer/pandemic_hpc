@@ -4,11 +4,9 @@ from hpc.create_config_params import create_global_config_args
 from dotenv import load_dotenv
 
 # Model parameters
-sim_name = "tobrfv_monthly_revEstabEq"
+sim_name = "tobrfv_lamdaWeights"
 start_run = 0
-end_run = 10
-# start_commodity = "0702"
-# end_commodity = "120991"
+end_run = 2
 commodity_list = ["0702", "120991", "070960"]
 country_of_interest = "Mexico"
 native_countries_list = ["Israel", "Jordan"]
@@ -16,6 +14,7 @@ native_countries_list = ["Israel", "Jordan"]
 # To keep one parameter static, pass it as a list e.g. alpha = [0.15]
 start_years = list(range(2012, 2014))
 alphas = [round(a, 2) for a in list(np.arange(0.25, 0.55, 0.1))]
+betas = [round(b, 2) for b in list(np.arange(0.15, 0.50, 0.05))]
 lamdas = [round(l, 2) for l in list(np.arange(0.2, 3, 0.2))]
 
 # Transmission lag type
@@ -58,10 +57,11 @@ season_dict = {
 }
 
 timestep = "monthly"
+lamda_weights_path = "/~/pandemic_hpc/inputs/Tomato_HarvestedArea_Percent_VegetablesPrimary_full.csv"
 
 # Summary statistics
-years_before_firstRecord = 10
-years_after_firstRecord = 1
+years_before_firstRecord = 50
+years_after_firstRecord = 0
 end_valid_year = 2020
 sim_years = [2014, 2023]  # list(range(2006,2035))
 
@@ -78,6 +78,7 @@ create_global_config_args(
     native_countries_list,
     start_years,
     alphas,
+    betas,
     lamdas,
     transmission_lag_type,
     gamma_shape,
@@ -91,4 +92,5 @@ create_global_config_args(
     years_after_firstRecord,
     end_valid_year,
     sim_years,
+    lamda_weights_path,
 )
