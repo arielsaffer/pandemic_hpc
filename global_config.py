@@ -57,7 +57,7 @@ season_dict = {
 }
 
 timestep = "monthly"
-lamda_weights_path = "/~/pandemic_hpc/inputs/Tomato_HarvestedArea_Percent_VegetablesPrimary_full.csv"
+lamda_weights_path = "/home/cawalden/pandemic_hpc/inputs/Tomato_HarvestedArea_Percent_VegetablesPrimary_full.csv"
 
 # Summary statistics
 years_before_firstRecord = 50
@@ -93,5 +93,4 @@ create_global_config_args(
     end_valid_year,
     sim_years,
     lamda_weights_path,
-    cols_to_drop=None,
 )

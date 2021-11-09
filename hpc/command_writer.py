@@ -11,7 +11,7 @@ alphas = config["alphas"]
 lamdas = config["lamdas"]
 betas = config["betas"]
 
-param_list = [alphas, lamdas, start_years, betas]
+param_list = [alphas, betas, lamdas, start_years]
 param_sets = list(itertools.product(*param_list))
 
 # Full run
@@ -27,9 +27,10 @@ for params in param_sets:
             [
                 "python",
                 model_script,
-                str(params[0]),
-                str(params[1]),
-                str(params[2]),
+                str(params[0]), # alpha
+                str(params[1]), # beta
+                str(params[2]), # lamda
+                str(params[3]), # start year
                 str(start_run),
                 str(end_run),
             ]

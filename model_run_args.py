@@ -9,7 +9,7 @@ from hpc.multiple_runs import create_params, execute_model_runs
 if __name__ == "__main__":
     alpha, beta, lamda_c_list, start_year, start_run, num_runs = [
         float(sys.argv[1]),
-        float(sys.argv[2])
+        float(sys.argv[2]),
         [float(sys.argv[3])],
         int(sys.argv[4]),
         int(sys.argv[5]),
