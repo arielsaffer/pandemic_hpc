@@ -1,10 +1,10 @@
 import json
 import os
 import sys
-import numpy as np
-from dotenv import load_dotenv
-import pandas as pd
 import geopandas
+import numpy as np
+import pandas as pd
+from dotenv import load_dotenv
 
 from helpers import create_trades_list
 from model_equations_quiet import pandemic_multiple_time_steps
@@ -23,18 +23,17 @@ input_dir = os.getenv("INPUT_PATH")
 out_dir = os.getenv("OUTPUT_PATH")
 countries_path = os.getenv("COUNTRIES_PATH")
 
-# Read pandemic arguments from configuration file
+# Read model arguments from configuration file
 path_to_config_json = sys.argv[1]
 with open(path_to_config_json) as json_file:
     config = json.load(json_file)
 
 commodity_path = config["commodity_path"]
 commodity_forecast_path = config["commodity_forecast_path"]
-print(commodity_forecast_path)
 native_countries_list = config["native_countries_list"]
 season_dict = config["season_dict"]
 alpha = config["alpha"]
-beta = 0.5
+beta = config["beta"]
 mu = config["mu"]
 lamda_c_list = config["lamda_c_list"]
 phi = config["phi"]
@@ -43,7 +42,6 @@ start_year = config["start_year"]
 stop_year = config["stop_year"]
 random_seed = config["random_seed"]
 cols_to_drop = config["columns_to_drop"]
-time_infect_units = config["transmission_lag_unit"]
 transmission_lag_type = config["transmission_lag_type"]
 time_infect = config["time_to_infectivity"]
 gamma_shape = config["transmission_lag_shape"]
@@ -54,6 +52,8 @@ save_entry = config["save_entry"]
 save_estab = config["save_estab"]
 save_intro = config["save_intro"]
 save_country_intros = config["save_country_intros"]
+scenario_list = config["scenario_list"]
+lamda_weights_path = config["lamda_weights_path"]
 
 countries = geopandas.read_file(countries_path, driver="GPKG")
 distances = np.load(input_dir + "/distance_matrix.npy")
@@ -75,7 +75,6 @@ for f in file_list_filtered:
     ts = str.split(os.path.splitext(fn)[0], "_")[-1]
     date_list.append(ts)
 date_list.sort()
-print(date_list)
 end_sim_year = date_list[-1][:4]
 
 # Example trade array for formatting outputs
@@ -95,11 +94,11 @@ print("Number of time steps: ", trades_list[0].shape[0])
 for i in range(len(trades_list)):
     if len(trades_list) > 1:
         code = code_list[i]
-        print("\nRunning pandemic for commodity: ", code)
+        print("\nRunning model for commodity: ", code)
     else:
         code = code_list[0]
         print(
-            "\nRunning pandemic for commodity: ",
+            "\nRunning model for commodity: ",
             os.path.basename(commodities_available[0]),
         )
     trades = trades_list[i]
@@ -127,6 +126,10 @@ for i in range(len(trades_list)):
 
     np.random.seed(random_seed)
     lamda_c = lamda_c_list[i]
+    if lamda_weights_path is not None:
+        lamda_weights = pd.read_csv(lamda_weights_path)
+    else:
+        lamda_weights = None
 
     if lamda_c > 0:
         e = pandemic_multiple_time_steps(
@@ -146,10 +149,11 @@ for i in range(len(trades_list)):
             date_list=date_list,
             season_dict=season_dict,
             transmission_lag_type=transmission_lag_type,
-            time_infect_units=time_infect_units,
             time_infect=time_infect,
             gamma_shape=gamma_shape,
             gamma_scale=gamma_scale,
+            scenario_list=scenario_list,
+            lamda_weights=lamda_weights,
         )
 
         sim_name = sys.argv[2]
@@ -174,7 +178,6 @@ for i in range(len(trades_list)):
             write_intro_probs=save_intro,
             write_country_intros=save_country_intros,
         )
-        print("saving pandemic outputs: ", outpath)
         full_out_df = save_model_output(
             model_output_object=e,
             example_trade_matrix=traded,
@@ -193,14 +196,10 @@ for i in range(len(trades_list)):
             aggregate_monthly_output_to_annual(
                 formatted_geojson=full_out_df, outpath=outpath
             )
-
         # If time steps are annual, export the predictions
         if len(date_list[i]) == 4:
             print("exporting annual predictions...")
             write_annual_output(formatted_geojson=full_out_df, outpath=outpath)
-
-        # Save pandemic metadata to text file
-        print("writing pandemic metadata...")
         write_model_metadata(
             main_model_output=e[0],
             alpha=alpha,
@@ -214,11 +213,10 @@ for i in range(len(trades_list)):
             start_year=start_year,
             end_sim_year=end_sim_year,
             transmission_lag_type=transmission_lag_type,
-            time_infect_units=time_infect_units,
+            time_infect=time_infect,
             gamma_shape=gamma_shape,
             gamma_scale=gamma_scale,
             random_seed=random_seed,
-            time_infect=time_infect,
             native_countries_list=native_countries_list,
             countries_path=countries_path,
             commodities_available=commodities_available[i],
@@ -226,7 +224,7 @@ for i in range(len(trades_list)):
             phyto_weights=list(locations["Phytosanitary Capacity"].unique()),
             outpath=outpath,
             run_num=run_num,
-            # scenario_list=scenario_list,
+            scenario_list=scenario_list,
         )
     else:
         print("\tskipping as pest is not transported with this commodity")

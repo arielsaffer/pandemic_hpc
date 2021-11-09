@@ -1,4 +1,3 @@
-import sys
 import os
 import re
 import glob
@@ -16,13 +15,16 @@ sim_name = "slf_inflationAdjusted_gridSearch_top"
 # and pandemic output metadata
 sim_path = os.path.join(root_dir, sim_name)
 run_prefix_list = [
-    os.path.basename(d) for d in (glob.glob(sim_path + "/*")) if os.path.isdir(d)
+    os.path.basename(d) for d in (
+        glob.glob(sim_path + "/*")
+        ) if os.path.isdir(d)
 ]
 if "header.csv" in run_prefix_list:
     run_prefix_list.remove("header.csv")
 commodity_codes_list = list(set([d.split("_")[-1] for d in run_prefix_list]))
 add_descript_list = (
-    [d.split(f"_{i}")[0] for d in run_prefix_list for i in commodity_codes_list]
+    [d.split(f"_{i}")[0] for d in run_prefix_list
+        for i in commodity_codes_list]
 )
 
 num_runs_list = []
@@ -49,9 +51,13 @@ for i in range(len(run_prefix_list)):
     parameter_values_list.append(parameter_values)
     starting_countries = meta_contents["NATIVE_COUNTRIES_T0"]
     starting_countries_list.append(starting_countries)
-    start_year = [param["start_year"] for param in meta_contents["PARAMETERS"]][0]
+    start_year = (
+        [param["start_year"] for param in meta_contents["PARAMETERS"]][0]
+    )
     start_year_list.append(start_year)
-    stop_year = [param["end_sim_year"] for param in meta_contents["PARAMETERS"]][0]
+    stop_year = (
+        [param["end_sim_year"] for param in meta_contents["PARAMETERS"]][0]
+    )
     stop_year_list.append(stop_year)
 
 # Write attributes to header file

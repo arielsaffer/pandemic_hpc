@@ -1,3 +1,23 @@
+"""
+PoPS Global
+
+Module containing all functions for saving, formatting, and aggregating
+outputs for the PoPS Global model.
+
+Copyright (C) 2019-2021 by the authors.
+
+Authors: Chris Jones (cmjone25 ncsu edu)
+         Chelsey Walden-Schreiner (cawalden ncsu edu)
+
+
+The code contained herein is licensed under the GNU General Public
+License. You may obtain a copy of the GNU General Public License
+Version 3 or later at the following locations:
+
+http://www.opensource.org/licenses/gpl-license.html
+http://www.gnu.org/copyleft/gpl.html
+"""
+
 import os
 import numpy as np
 import pandas as pd
@@ -13,15 +33,15 @@ def create_model_dirs(
     write_country_intros=False,
 ):
     """
-    Creates directory and folders for pandemic output files.
+    Creates directory and folders for model output files.
 
     Parameters
     ----------
     outpath : String
-        Absolute path of directory where pandemic output are saved
+        Absolute path of directory where model output are saved
     output_dict : Dictionary
         Key-value pairs identifying the object name and folder name
-        of pandemic output components.
+        of model output components.
     write_entry_probs : bool
         Indicates whether to save n x n matrices for each time
         step where n is the number of countries, and values
@@ -66,14 +86,14 @@ def save_model_output(
     columns_to_drop=None,
 ):
     """
-    Saves pandemic output, including probabilities for entry, establishment,
+    Saves model output, including probabilities for entry, establishment,
     and introduction. Full forecast dataframe, origin-destination pairs,
     and list of time steps formatted as YYYYMM.
 
     Parameters
     ----------
     model_output_object : numpy array
-        List of 6 n x n arrays created by running pandemic pandemic, ordered as
+        List of 6 n x n arrays created by running pandemic model, ordered as
         1) full forecast dataframe; 2) probability of entry;
         3) probability of establishment; 4) probability of introduction;
         5) origin - destination pairs; and 6) list of countries where pest is
@@ -101,13 +121,13 @@ def save_model_output(
         represent the origin-destination probability of
         introduction. Default is False.
     columns_to_drop : list
-        Optional list of columns used or created by the pandemic that are to drop
+        Optional list of columns used or created by the model that are to drop
         from the final output (e.g., Koppen climate classifications)
 
     Returns
     -------
     model_output_df : geodataframe
-        Geodataframe of pandemic outputs
+        Geodataframe of model outputs
 
 
     """
@@ -119,7 +139,7 @@ def save_model_output(
     origin_dst = model_output_object[4]
     country_intro = model_output_object[5]
 
-    # saving main pandemic output with overall introduction
+    # saving main model output with overall introduction
     # probabilities for each time step
     if columns_to_drop is not None:
         model_output_gdf = model_output_gdf.drop(columns_to_drop, axis=1)
@@ -225,7 +245,7 @@ def get_feature_cols(geojson_obj, feature_chars):
     ----------
     geojson_obj : geodataframe
         A geodataframe object containing the original
-        pandemic output columns and format
+        model output columns and format
 
     feature_chars : str
         String of characters identifying the column
@@ -263,7 +283,7 @@ def create_feature_dict(geojson_obj, column_list, chars_to_strip):
     ----------
     geojson_obj : geodataframe
         A geodataframe containing the original
-        pandemic output columns and format
+        model output columns and format
 
     column_list : list
         List of columns to use
@@ -294,7 +314,7 @@ def add_dict_to_geojson(geojson_obj, new_col_name, dictionary_obj):
     ----------
     geojson_obj : geodataframe
         A geodataframe containing the original
-        pandemic output columns and format
+        model output columns and format
 
     new_col_name : str
         Name of new column to be added to the
@@ -318,13 +338,13 @@ def add_dict_to_geojson(geojson_obj, new_col_name, dictionary_obj):
 
 def aggregate_monthly_output_to_annual(formatted_geojson, outpath):
     """
-    Aggregate monthly time step predictions from the pandemic to annual
+    Aggregate monthly time step predictions from the model to annual
     predictions of presence and probability of introduction
 
     Parameters
     ----------
     formatted_geojson : geodataframe
-        Geodataframe containing original pandemic output as well as
+        Geodataframe containing original model output as well as
         additional columns with year: value dictionaries.
 
     outpath : str
@@ -359,20 +379,16 @@ def write_annual_output(formatted_geojson, outpath):
     """
     When the model is run with an annual timestep, export the annual
     predictions of presence and probability of introduction
-
     Parameters
     ----------
     formatted_geojson : geodataframe
         Geodataframe containing original pandemic output as well as
         additional columns with year: value dictionaries.
-
     outpath : str
         Directory path to save output (geojson and csv)
-
     Returns
     -------
     none
-
     """
     prob_intro_cols = [
         c
@@ -406,7 +422,6 @@ def write_model_metadata(
     end_sim_year,
     transmission_lag_type,
     time_infect,
-    time_infect_units,
     gamma_shape,
     gamma_scale,
     random_seed,
@@ -418,14 +433,15 @@ def write_model_metadata(
     outpath,
     run_num,
     scenario_list=None,
+    lamda_weights_path=None,
 ):
     """
-    Write pandemic parameters and configuration to metadata file
+    Write model parameters and configuration to metadata file
 
     Parameters
     ----------
     numpy array
-        List of 6 n x n arrays created by running pandemic pandemic, ordered as
+        List of 6 n x n arrays created by running pandemic model, ordered as
         1) full forecast dataframe; 2) probability of entry;
         3) probability of establishment; 4) probability of introduction;
         5) origin - destination pairs; and 6) list of countries where pest is
@@ -459,8 +475,6 @@ def write_model_metadata(
     transmission_lag_type : str
         Type of transmission lag used in the simulation (i.e., None,
         static, or stochastic)
-    time_infect_units : str
-        Units associated with the transmission lag value (i.e., years, months)
     time_infect : int
         Time until a country is infectious, set for static transmission lag
     gamma_shape : float
@@ -507,7 +521,6 @@ def write_model_metadata(
             "end_sim_year": str(end_sim_year),
             "transmission_lag_type": str(transmission_lag_type),
             "infectivity_lag": time_infect,
-            "transmission_lag_units": time_infect_units,
             "gamma_shape": gamma_shape,
             "gamma_scale": gamma_scale,
             "random_seed": str(random_seed),
@@ -527,6 +540,7 @@ def write_model_metadata(
         - len(native_countries_list)
     )
     meta["TRADE SCENARIO"] = scenario_list
+    meta["LAMDA WEIGHTS"] = lamda_weights_path
 
     with open(f"{outpath}/run_{run_num}_meta.json", "w") as file:
         json.dump(meta, file, indent=4)

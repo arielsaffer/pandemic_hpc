@@ -47,6 +47,7 @@ if __name__ == "__main__":
             "run_num",
             "start",
             "alpha",
+            "beta",
             "lamda",
             "total_countries_intros_predicted",
             "diff_total_countries",

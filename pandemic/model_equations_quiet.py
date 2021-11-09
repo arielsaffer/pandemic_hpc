@@ -1,11 +1,14 @@
 """
-PoPS Pandemic - Simulation
+PoPS Global
 
-Module containing all calculations for the Pandemic pandemic
+Module containing all calcualtions for the PoPS Global model
 
 Copyright (C) 2019-2020 by the authors.
 
 Authors: Chris Jones (cmjone25 ncsu edu)
+         Chelsey Walden-Schreiner (cawalden ncsu edu)
+         Kellyn Montgomery
+         Ariel Saffer
 
 The code contained herein is licensed under the GNU General Public
 License. You may obtain a copy of the GNU General Public License
@@ -46,11 +49,11 @@ def pandemic_single_time_step(
     time_step,
     season_dict,
     transmission_lag_type,
-    time_infect_units,
     time_infect,
     gamma_shape,
     gamma_scale,
     scenario_list=None,
+    lamda_weights=None,
 ):
     """
     Returns the probability of establishment, probability of entry, and
@@ -89,7 +92,7 @@ def pandemic_single_time_step(
     mu : float
         The mortality rate of the pest or pathogen during transport
     lamda_c : float
-        The commodity importance [0,1] of commodity (c) in transporting the
+        The commodity importance of commodity (c) in transporting the
         pest or pathogen
     phi : int
         The degree of polyphagy of the pest of interest described as the number
@@ -119,8 +122,6 @@ def pandemic_single_time_step(
     transmission_lag_type : str
         Type of transmission lag used in the simulation (i.e., None,
         static, or stochastic)
-    time_infect_units : str
-        Units associated with the transmission lag value (i.e., years, months)
     time_infect : int
         Time until a country is infectious, set for static transmission lag
     gamma_shape : float
@@ -131,6 +132,11 @@ def pandemic_single_time_step(
         Nested list of scenarios, with elements ordered as: year (YYYY),
         origin ISO3 code, destination ISO3 code, adjustment type (e.g.,
         "increase", "decrease"), and adjustment percent.
+    lamda_weights : data frame (optional)
+        Dataframe of weights applied to lamda when the commodity of interest
+        is aggregated with others in the HS code (e.g., tomato seed grouped
+        with vegetable seed in Comtrade data). Value can be the proportion
+        of the import thought to be the commodity of interest.
 
     Returns
     -------
@@ -172,6 +178,7 @@ def pandemic_single_time_step(
         # and populating output matrices
         i = locations.index[locations["ISO3"] == loc_pair[0]][0]
         origin = locations.iloc[i, :]
+
         # check that Phytosanitary capacity data is available if not
         # set value to 0 to remove this aspect of the equation
         if "Phytosanitary Capacity" in origin:
@@ -189,14 +196,13 @@ def pandemic_single_time_step(
                 time_step_year = int(time_step[:4])
             elif len(time_step) == 4:
                 time_step_year = int(time_step)
-            scenario = (
-                [
-                    item for item in scenario_list
-                    if item[0] == time_step_year
-                    and item[1] == origin["ISO3"]
-                    and item[2] == destination["ISO3"]
-                ]
-            )
+            scenario = [
+                item
+                for item in scenario_list
+                if item[0] == time_step_year
+                and item[1] == origin["ISO3"]
+                and item[2] == destination["ISO3"]
+            ]
             if len(scenario) == 1:
                 print(f"\tAdjusting trade for {origin['ISO3']}-{destination['ISO3']}")
                 print(f"\t\tfrom: {T_ijct}")
@@ -233,6 +239,13 @@ def pandemic_single_time_step(
             if T_ijct == 0:
                 probability_of_entry_ijct = 0
             else:
+                if lamda_weights is not None:
+                    lamda_c_weight = lamda_weights[
+                        lamda_weights["ISO3"] == destination["ISO3"]
+                    ]["lamda_weight_scaled"].values[0]
+                else:
+                    lamda_c_weight = 0
+
                 probability_of_entry_ijct = probability_of_entry(
                     rho_i,
                     rho_j,
@@ -244,7 +257,9 @@ def pandemic_single_time_step(
                     mu,
                     d_ij,
                     chi_it,
+                    lamda_c_weight,
                 )
+
             probability_of_establishment_ijt = probability_of_establishment(
                 alpha,
                 beta,
@@ -327,7 +342,7 @@ def pandemic_single_time_step(
                             new
                         )
                     # else:
-                        # print("\t\t\t\tkeeping: ", current)
+                    #     print("\t\t\t\tkeeping: ", current)
 
             if origin_destination.empty:
                 origin_destination = pd.DataFrame(
@@ -381,11 +396,11 @@ def pandemic_multiple_time_steps(
     date_list,
     season_dict,
     transmission_lag_type,
-    time_infect_units,
     time_infect,
     gamma_shape,
     gamma_scale,
     scenario_list=None,
+    lamda_weights=None,
 ):
 
     """
@@ -442,8 +457,6 @@ def pandemic_multiple_time_steps(
     transmission_lag_type : str
         Type of transmission lag used in the simulation (i.e., None,
         static, or stochastic)
-    time_infect_units : str
-        Units associated with the transmission lag value (i.e., years, months)
     time_infect : int
         Time until a country is infectious, set for static transmission lag
     gamma_shape : float
@@ -524,11 +537,11 @@ def pandemic_multiple_time_steps(
             time_step=ts,
             season_dict=season_dict,
             transmission_lag_type=transmission_lag_type,
-            time_infect_units=time_infect_units,
             time_infect=time_infect,
             gamma_shape=gamma_shape,
             gamma_scale=gamma_scale,
             scenario_list=scenario_list,
+            lamda_weights=lamda_weights,
         )
 
         establishment_probabilities[t] = ts_out[1]

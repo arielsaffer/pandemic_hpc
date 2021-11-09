@@ -7,6 +7,7 @@ def create_config_args(
     commodity_path,
     native_countries_list,
     alpha,
+    beta,
     mu,
     lamda_c_list,
     phi,
@@ -27,6 +28,7 @@ def create_config_args(
     gamma_scale=None,
     random_seed=None,
     cols_to_drop=None,
+    lamda_weights_path=None,
 ):
 
     args = {}
@@ -40,8 +42,10 @@ def create_config_args(
     args["season_dict"] = season_dict
     # pandemic parameter values
     args["alpha"] = alpha
+    args["beta"] = beta
     args["mu"] = mu
     args["lamda_c_list"] = lamda_c_list
+    args["lamda_weights_path"] = lamda_weights_path
     args["phi"] = phi
     args["w_phi"] = w_phi
     args["start_year"] = start_year

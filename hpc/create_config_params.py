@@ -7,12 +7,11 @@ def create_global_config_args(
     start_run,
     end_run,
     commodity_list,
-    # start_commodity,
-    # end_commodity,
     country_of_interest,
     native_countries_list,
     start_years,
     alphas,
+    betas,
     lamdas,
     transmission_lag_type,
     gamma_shape,
@@ -26,6 +25,7 @@ def create_global_config_args(
     years_after_firstRecord,
     end_valid_year,
     sim_years,
+    lamda_weights_path=None,
 ):
 
     args = {}
@@ -42,7 +42,9 @@ def create_global_config_args(
     args["native_countries_list"] = native_countries_list
     args["start_years"] = start_years
     args["alphas"] = alphas
+    args["betas"] = betas
     args["lamdas"] = lamdas
+    args["lamda_weights_path"] = lamda_weights_path
     args["transmission_lag_type"] = transmission_lag_type
     args["gamma_shape"] = gamma_shape
     args["gamma_scale"] = gamma_scale

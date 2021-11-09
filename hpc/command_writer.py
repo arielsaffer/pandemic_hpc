@@ -9,8 +9,9 @@ with open("config.json") as json_file:
 start_years = config["start_years"]
 alphas = config["alphas"]
 lamdas = config["lamdas"]
+betas = config["betas"]
 
-param_list = [alphas, lamdas, start_years]
+param_list = [alphas, lamdas, start_years, betas]
 param_sets = list(itertools.product(*param_list))
 
 # Full run
