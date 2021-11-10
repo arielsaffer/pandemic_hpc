@@ -92,5 +92,5 @@ create_global_config_args(
     years_after_firstRecord,
     end_valid_year,
     sim_years,
-    lamda_weights_path,
+    lamda_weights_path
 )

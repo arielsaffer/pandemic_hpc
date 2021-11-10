@@ -26,6 +26,8 @@ def create_global_config_args(
     end_valid_year,
     sim_years,
     lamda_weights_path=None,
+    scenario_list=None,
+
 ):
 
     args = {}
@@ -57,6 +59,7 @@ def create_global_config_args(
     args["years_after_firstRecord"] = years_after_firstRecord
     args["end_valid_year"] = end_valid_year
     args["sim_years"] = sim_years
+    args["scenario_list"] = scenario_list
 
     # Write arguments to json file
     config_json_path = project_loc + "/config.json"

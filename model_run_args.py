@@ -71,6 +71,7 @@ if __name__ == "__main__":
         gamma_scale=None,
         random_seed=50,
         cols_to_drop=None,
+        scenario_list=None,
         lamda_weights_path=lamda_weights_path,
     )
 
