@@ -30,6 +30,7 @@ with open(path_to_config_json) as json_file:
 
 commodity_path = config["commodity_path"]
 commodity_forecast_path = config["commodity_forecast_path"]
+commodity_list = config["commodity_list"]
 native_countries_list = config["native_countries_list"]
 season_dict = config["season_dict"]
 alpha = config["alpha"]
@@ -61,6 +62,7 @@ climate_similarities = np.load(input_dir + "/climate_similarities.npy")
 
 # Read & format trade data
 trades_list, file_list_filtered, code_list, commodities_available = create_trades_list(
+    commmodity_list=commodity_list,
     commodity_path=commodity_path,
     commodity_forecast_path=commodity_forecast_path,
     start_year=start_year,

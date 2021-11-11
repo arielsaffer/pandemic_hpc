@@ -127,6 +127,7 @@ def filter_trades_list(
 
 
 def create_trades_list(
+    commodity_list,
     commodity_path,
     commodity_forecast_path,
     start_year,
@@ -140,6 +141,8 @@ def create_trades_list(
 
     Parameters:
     -----------
+    commodity_list : list
+        list of commodities for which to run the model
     commodity_path : str
         path to all historical commodity trade data
     commodity_forecast_path : str
@@ -175,60 +178,72 @@ def create_trades_list(
     # multiple commodity codes)
     if len(commodities_available) == 1:
         code_list = [os.path.split(f)[1] for f in commodities_available]
-        print("\t", commodities_available)
-        file_list_historical = glob.glob(commodity_path + "/*.csv")
-        file_list_historical.sort()
-        if commodity_forecast_path is not None:
-            file_list_forecast = glob.glob(commodity_forecast_path + "/*.csv")
-            file_list_forecast.sort()
-            file_list = file_list_historical + file_list_forecast
-        else:
-            file_list = file_list_historical
-
-        file_list_filtered = filter_trades_list(
-            file_list=file_list, start_year=start_year, stop_year=stop_year,
-        )
-        trades = np.zeros(
-            shape=(len(file_list_filtered), distances.shape[0], distances.shape[0])
-        )
-        for i in range(len(file_list_filtered)):
-            trades[i] = pd.read_csv(
-                file_list_filtered[i], sep=",", header=0, index_col=0, encoding="latin1"
-            ).values
-        trades_list.append(trades)
-    # If trade data are stored by HS code
-    else:
-        for i in range(len(commodities_available)):
-            code_list = [os.path.split(f)[1] for f in commodities_available]
-            code = code_list[i]
-            print("\t", commodities_available[i])
-            file_list_historical = glob.glob(commodity_path + f"/{code}/*.csv")
+        if code_list[0] in commodity_list:
+            print("\t", commodities_available)
+            file_list_historical = glob.glob(commodity_path + "/*.csv")
             file_list_historical.sort()
-
             if commodity_forecast_path is not None:
-                file_list_forecast = glob.glob(
-                    commodity_forecast_path + f"/{code}/*.csv"
-                )
+                file_list_forecast = glob.glob(commodity_forecast_path + "/*.csv")
                 file_list_forecast.sort()
                 file_list = file_list_historical + file_list_forecast
             else:
                 file_list = file_list_historical
 
             file_list_filtered = filter_trades_list(
-                file_list=file_list, start_year=start_year
+                file_list=file_list, start_year=start_year, stop_year=stop_year,
             )
             trades = np.zeros(
                 shape=(len(file_list_filtered), distances.shape[0], distances.shape[0])
             )
             for i in range(len(file_list_filtered)):
                 trades[i] = pd.read_csv(
-                    file_list_filtered[i],
-                    sep=",",
-                    header=0,
-                    index_col=0,
-                    encoding="latin1",
+                    file_list_filtered[i], sep=",", header=0, index_col=0, encoding="latin1"
                 ).values
             trades_list.append(trades)
+        else:
+            print(
+                rf"\tData available for {code_list},"
+                rf"\n\{commodity_list} provided in config.json"
+            )
+    # If trade data are stored by HS code
+    else:
+        for i in range(len(commodities_available)):
+            code_list = [os.path.split(f)[1] for f in commodities_available]
+            code = code_list[i]
+            if code in commodity_list:
+                print("\t", commodities_available[i])
+                file_list_historical = glob.glob(commodity_path + f"/{code}/*.csv")
+                file_list_historical.sort()
+
+                if commodity_forecast_path is not None:
+                    file_list_forecast = glob.glob(
+                        commodity_forecast_path + f"/{code}/*.csv"
+                    )
+                    file_list_forecast.sort()
+                    file_list = file_list_historical + file_list_forecast
+                else:
+                    file_list = file_list_historical
+
+                file_list_filtered = filter_trades_list(
+                    file_list=file_list, start_year=start_year
+                )
+                trades = np.zeros(
+                    shape=(len(file_list_filtered), distances.shape[0], distances.shape[0])
+                )
+                for i in range(len(file_list_filtered)):
+                    trades[i] = pd.read_csv(
+                        file_list_filtered[i],
+                        sep=",",
+                        header=0,
+                        index_col=0,
+                        encoding="latin1",
+                    ).values
+                trades_list.append(trades)
+            else:
+                print(
+                    rf"\tData available for {code_list},"
+                    rf"\n\{commodity_list} provided in config.json"
+                )
 
     return trades_list, file_list_filtered, code_list, commodities_available
 
