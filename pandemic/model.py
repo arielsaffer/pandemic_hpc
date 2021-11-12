@@ -62,7 +62,7 @@ climate_similarities = np.load(input_dir + "/climate_similarities.npy")
 
 # Read & format trade data
 trades_list, file_list_filtered, code_list, commodities_available = create_trades_list(
-    commmodity_list=commodity_list,
+    commodity_list=commodity_list,
     commodity_path=commodity_path,
     commodity_forecast_path=commodity_forecast_path,
     start_year=start_year,
