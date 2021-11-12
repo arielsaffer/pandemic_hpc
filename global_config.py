@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 sim_name = "tobrfv_lamdaWeights"
 start_run = 0
 end_run = 2
-commodity_list = ["0702", "120991", "070960"]
+commodity_list = ["120991"]
 country_of_interest = "Mexico"
 native_countries_list = ["Israel", "Jordan"]
 
