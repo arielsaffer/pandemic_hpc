@@ -1,8 +1,6 @@
 #!/bin/tcsh
 # Script: wrapper_script.csh (individual sample)
 
-# Set the path for the temporary file directory
-
 # Create the directory 
 mkdir -p /scratch/temp_outputs/samp$1_$2_$3
 
