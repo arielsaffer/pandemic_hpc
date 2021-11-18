@@ -49,7 +49,7 @@ if __name__ == "__main__":
     param_vals, config_file_path = create_config_args(
         config_out_path=config_out_path,
         commodity_list=commodity_list,
-        commodity_path=input_dir + f"/comtrade/{timestep}_adjusted/{commodity}",
+        commodity_path=input_dir + f"/comtrade/{timestep}_adjusted/",
         native_countries_list=native_countries_list,
         alpha=alpha,
         beta=beta,

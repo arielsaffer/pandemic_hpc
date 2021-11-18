@@ -4,6 +4,7 @@ import os
 
 def create_config_args(
     config_out_path,
+    commodity_list,
     commodity_path,
     native_countries_list,
     alpha,
@@ -19,7 +20,6 @@ def create_config_args(
     save_estab=False,
     save_intro=False,
     save_country_intros=False,
-    stop_year=None,
     commodity_forecast_path=None,
     season_dict=None,
     transmission_lag_type=None,
@@ -36,6 +36,7 @@ def create_config_args(
 
     # Directory and file paths
     args["commodity_path"] = commodity_path
+    args["commodity_list"] = commodity_list
     args["commodity_forecast_path"] = commodity_forecast_path
     # List of countries where pest is present at time T0
     args["native_countries_list"] = native_countries_list
