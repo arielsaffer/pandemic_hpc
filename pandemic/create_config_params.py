@@ -14,6 +14,7 @@ def create_config_args(
     phi,
     w_phi,
     start_year,
+    stop_year=None,
     save_main_output=True,
     save_metadata=True,
     save_entry=False,

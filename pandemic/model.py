@@ -61,13 +61,15 @@ distances = np.load(input_dir + "/distance_matrix.npy")
 climate_similarities = np.load(input_dir + "/climate_similarities.npy")
 
 # Read & format trade data
-trades_list, file_list_filtered, code_list, commodities_available = create_trades_list(
-    commodity_list=commodity_list,
-    commodity_path=commodity_path,
-    commodity_forecast_path=commodity_forecast_path,
-    start_year=start_year,
-    stop_year=stop_year,
-    distances=distances,
+trades_list, file_list_filtered, code_list, commodities_available = (
+    create_trades_list(
+        commodity_list=commodity_list,
+        commodity_path=commodity_path,
+        commodity_forecast_path=commodity_forecast_path,
+        start_year=start_year,
+        stop_year=stop_year,
+        distances=distances,
+    )
 )
 
 # Create list of unique dates from trade data
@@ -91,7 +93,6 @@ for i in range(len(trades_list)):
 
 
 # Run Model for Selected Time Steps and Commodities
-print("Number of commodities: ", len([c for c in lamda_c_list if c > 0]))
 print("Number of time steps: ", trades_list[0].shape[0])
 for i in range(len(trades_list)):
     if len(trades_list) > 1:
@@ -99,10 +100,7 @@ for i in range(len(trades_list)):
         print("\nRunning model for commodity: ", code)
     else:
         code = code_list[0]
-        print(
-            "\nRunning model for commodity: ",
-            os.path.basename(commodities_available[0]),
-        )
+        print("\nRunning model for commodity: ", code)
     trades = trades_list[i]
     distances = distances
     locations = countries
@@ -221,7 +219,7 @@ for i in range(len(trades_list)):
             random_seed=random_seed,
             native_countries_list=native_countries_list,
             countries_path=countries_path,
-            commodities_available=commodities_available[i],
+            commodity=code,
             commodity_forecast_path=commodity_forecast_path,
             phyto_weights=list(locations["Phytosanitary Capacity"].unique()),
             outpath=outpath,

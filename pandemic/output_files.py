@@ -164,7 +164,9 @@ def save_model_output(
             country_int_pd.columns = example_trade_matrix.columns
             country_int_pd.index = example_trade_matrix.index
             country_int_pd.to_csv(
-                outpath + f"/country_introduction/country_introduction_{str(ts)}.csv",
+                outpath + (
+                    f"/country_introduction/country_introduction_{str(ts)}.csv"
+                ),
                 float_format="%.4f",
                 na_rep="NAN!",
             )
@@ -184,7 +186,10 @@ def save_model_output(
             pro_est_pd.columns = example_trade_matrix.columns
             pro_est_pd.index = example_trade_matrix.index
             pro_est_pd.to_csv(
-                outpath + f"/prob_est/probability_of_establishment_{str(ts)}.csv",
+                (
+                    outpath +
+                    f"/prob_est/probability_of_establishment_{str(ts)}.csv"
+                ),
                 float_format="%.4f",
                 na_rep="NAN!",
             )
@@ -194,7 +199,10 @@ def save_model_output(
             pro_intro_pd.columns = example_trade_matrix.columns
             pro_intro_pd.index = example_trade_matrix.index
             pro_intro_pd.to_csv(
-                outpath + f"/prob_intro/probability_of_introduction_{str(ts)}.csv",
+                (
+                    outpath +
+                    f"/prob_intro/probability_of_introduction_{str(ts)}.csv"
+                ),
                 float_format="%.4f",
                 na_rep="NAN!",
             )
@@ -267,9 +275,15 @@ def get_feature_cols(geojson_obj, feature_chars):
 
     """
 
-    feature_cols = [c for c in geojson_obj.columns if c.startswith(feature_chars)]
-    feature_cols_monthly = [c for c in feature_cols if len(c.split(" ")[-1]) > 5]
-    feature_cols_annual = [c for c in feature_cols if c not in feature_cols_monthly]
+    feature_cols = (
+        [c for c in geojson_obj.columns if c.startswith(feature_chars)]
+    )
+    feature_cols_monthly = (
+        [c for c in feature_cols if len(c.split(" ")[-1]) > 5]
+    )
+    feature_cols_annual = (
+        [c for c in feature_cols if c not in feature_cols_monthly]
+    )
 
     return feature_cols, feature_cols_monthly, feature_cols_annual
 
@@ -360,18 +374,24 @@ def aggregate_monthly_output_to_annual(formatted_geojson, outpath):
         for c in formatted_geojson.columns
         if c.startswith("Probability of introduction")
     ]
-    annual_ts_list = sorted(set([y.split(" ")[-1][:4] for y in prob_intro_cols]))
+    annual_ts_list = sorted(
+        set([y.split(" ")[-1][:4] for y in prob_intro_cols])
+    )
     for year in annual_ts_list:
         prob_cols = [c for c in prob_intro_cols if str(year) in c]
         formatted_geojson[f"Agg Prob Intro {year}"] = formatted_geojson.apply(
             lambda row: agg_prob(row=row, column_list=prob_cols), axis=1
         )
-        formatted_geojson[f"Presence {year}"] = formatted_geojson[f"Presence {year}12"]
+        formatted_geojson[f"Presence {year}"] = (
+            formatted_geojson[f"Presence {year}12"]
+        )
 
     out_csv = pd.DataFrame(formatted_geojson)
     out_csv.drop(["geometry"], axis=1, inplace=True)
     out_csv.to_csv(
-        outpath + "/pandemic_output_aggregated.csv", float_format="%.2f", na_rep="NAN!"
+        outpath + "/pandemic_output_aggregated.csv",
+        float_format="%.2f",
+        na_rep="NAN!"
     )
 
 
@@ -395,7 +415,9 @@ def write_annual_output(formatted_geojson, outpath):
         for c in formatted_geojson.columns
         if c.startswith("Probability of introduction")
     ]
-    annual_ts_list = sorted(set([y.split(" ")[-1][:4] for y in prob_intro_cols]))
+    annual_ts_list = sorted(
+        set([y.split(" ")[-1][:4] for y in prob_intro_cols])
+    )
     for year in annual_ts_list:
         formatted_geojson[f"Agg Prob Intro {year}"] = formatted_geojson[
             f"Probability of introduction {year}"
@@ -404,7 +426,9 @@ def write_annual_output(formatted_geojson, outpath):
     out_csv = pd.DataFrame(formatted_geojson)
     out_csv.drop(["geometry"], axis=1, inplace=True)
     out_csv.to_csv(
-        outpath + "/pandemic_output_aggregated.csv", float_format="%.2f", na_rep="NAN!"
+        outpath + "/pandemic_output_aggregated.csv",
+        float_format="%.2f",
+        na_rep="NAN!"
     )
 
 
@@ -427,7 +451,7 @@ def write_model_metadata(
     random_seed,
     native_countries_list,
     countries_path,
-    commodities_available,
+    commodity,
     commodity_forecast_path,
     phyto_weights,
     outpath,
@@ -482,10 +506,11 @@ def write_model_metadata(
     gamma_scale: float
         Scale parameter for gamma distribution used in stochastic transmission.
     native_countries_list : list
-        Countries with pest or pathogen present at first time step of simulation
+        Countries with pest or pathogen present at first time step
+        of simulation
     countries_path : str
         File path to countries geopackage used
-    commodities_available :
+    commodity :
         Commodity simulated
     commodity_forecast_path : str
         Path to forecasted trade data
@@ -532,7 +557,7 @@ def write_model_metadata(
         meta["PARAMETERS"][0].update({"infectivity_lag": None})
     meta["NATIVE_COUNTRIES_T0"] = native_countries_list
     meta["COUNTRIES GPKG"] = countries_path
-    meta["COMMODITY"] = commodities_available
+    meta["COMMODITY"] = commodity
     meta["FORECASTED"] = commodity_forecast_path
     meta["PHYTOSANITARY_CAPACITY_WEIGHTS"] = phyto_weights
     meta["TOTAL COUNTRIES INTRODUCTED"] = str(
