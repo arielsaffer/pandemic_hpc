@@ -3,7 +3,6 @@ import glob
 import math
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
 import json
 import re
 
@@ -40,7 +39,7 @@ def compute_summary_stats(
     ]
     # First introduction year predicted
     model_output["PredFirstIntro"] = np.where(
-        model_output[presence_cols].any(axis=1) is True,
+        model_output[presence_cols].any(axis=1),
         model_output[presence_cols].idxmax(axis=1),
         "Presence 9999",
     )
@@ -48,9 +47,12 @@ def compute_summary_stats(
         model_output["PredFirstIntro"].str.replace("Presence ", "")
     ).astype(int)
 
-    # Merge with validation data (ISO3 - First Record Year)
-    model_output = model_output.merge(validation_df, how="left", on="ISO3")
+    model_output.set_index("ISO3", inplace=True)
 
+    # Merge with validation data (ISO3 - First Record Year)
+    model_output = model_output.merge(
+        validation_df, how="left", left_index=True, right_index=True
+    )
     # Difference in years between prediction and obesrvation
     model_output["pred_diff"] = np.where(
         model_output["PredFirstIntro"] != 9999,
@@ -97,9 +99,9 @@ def compute_summary_stats(
 
     countries_dict = {}
     for ISO3 in validation_df.index:
-        countries_dict[f"diff_obs_pred_metric_{ISO3}"] = (
-            model_output.loc[ISO3]["obs-pred_metric"]
-        )
+        countries_dict[f"diff_obs_pred_metric_{ISO3}"] = model_output.loc[ISO3][
+            "obs-pred_metric"
+        ]
 
     # Save results in dictionary from which to build the dataframe
     summary_stats_dict = {
@@ -120,9 +122,7 @@ def compute_summary_stats(
         ].std(),
     }
 
-    summary_stats_dict = {
-        **summary_stats_dict, **year_probs_dict, **countries_dict
-    }
+    summary_stats_dict = {**summary_stats_dict, **year_probs_dict, **countries_dict}
 
     return model_output, summary_stats_dict
 
@@ -145,9 +145,7 @@ def compute_stat_wrapper_func(param_sample):
         header=0,
         index_col=0,
     )
-    run_outputs = glob.glob(
-        f"{param_sample}/run*/pandemic_output_aggregated.csv"
-    )
+    run_outputs = glob.glob(f"{param_sample}/run*/pandemic_output_aggregated.csv")
 
     # Set up probability by year dictionary keys (column names)
     year_probs_dict_keys = []
@@ -163,6 +161,7 @@ def compute_stat_wrapper_func(param_sample):
             "run_num",
             "start",
             "alpha",
+            "beta",
             "lamda",
             "total_countries_intros_predicted",
             "diff_total_countries",
@@ -181,11 +180,12 @@ def compute_stat_wrapper_func(param_sample):
         sample = re.split("[\\\\/]", run_outputs[i])[-3]
         start = sample.split("year")[1].split("_")[0]
         alpha = sample.split("alpha")[1].split("_")[0]
+        beta = sample.split("beta")[1].split("_")[0]
         lamda = sample.split("lamda")[1].split("_")[0]
         df = pd.read_csv(
             run_outputs[i], sep=",", header=0, index_col=0, encoding="latin1"
         )
-        df.set_index("ISO3", inplace=True)
+        # df.set_index("ISO3", inplace=True)
         _, summary_stat_dict = compute_summary_stats(
             df,
             validation_df,
@@ -201,10 +201,9 @@ def compute_stat_wrapper_func(param_sample):
         summary_stat_dict["sample"] = param_sample
         summary_stat_dict["start"] = start
         summary_stat_dict["alpha"] = alpha
+        summary_stat_dict["beta"] = beta
         summary_stat_dict["lamda"] = lamda
-        summary_stat_df = summary_stat_df.append(
-            summary_stat_dict, ignore_index=True
-        )
+        summary_stat_df = summary_stat_df.append(summary_stat_dict, ignore_index=True)
     # summary_stat_df = pd.DataFrame(summary_stat_dict, index=[0])
     return summary_stat_df
 
@@ -236,8 +235,6 @@ def fbeta(precision, recall, weight):
 
 def f1(precision, recall):
     if (precision != 0) and (recall != 0):
-        return (2 * precision * recall) / (
-            precision + recall
-        )
+        return (2 * precision * recall) / (precision + recall)
     else:
         return 0
