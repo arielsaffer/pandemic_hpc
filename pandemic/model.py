@@ -225,6 +225,7 @@ for i in range(len(trades_list)):
             outpath=outpath,
             run_num=run_num,
             scenario_list=scenario_list,
+            lamda_weights_path=lamda_weights_path
         )
     else:
         print("\tskipping as pest is not transported with this commodity")
