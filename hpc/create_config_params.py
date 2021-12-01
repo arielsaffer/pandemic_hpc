@@ -27,7 +27,6 @@ def create_global_config_args(
     sim_years,
     lamda_weights_path=None,
     scenario_list=None,
-
 ):
 
     args = {}
@@ -37,7 +36,7 @@ def create_global_config_args(
     args["sim_name"] = sim_name
     args["start_run"] = start_run
     args["end_run"] = end_run
-    args['commodity_list'] = commodity_list
+    args["commodity_list"] = commodity_list
     # args["start_commodity"] = start_commodity
     # args["end_commodity"] = end_commodity
     args["country_of_interest"] = country_of_interest
@@ -62,7 +61,7 @@ def create_global_config_args(
     args["scenario_list"] = scenario_list
 
     # Write arguments to json file
-    config_json_path = project_loc + "/config.json"
+    config_json_path = "config.json"
     with open(config_json_path, "w") as file:
         json.dump(args, file, indent=4)
     print("\tSaved ", config_json_path)
