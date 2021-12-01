@@ -59,7 +59,7 @@ season_dict = {
 timestep = "monthly"
 data_path = "/share/rkmeente/cawalden/pops_global"
 lamda_weights_path = (
-    rf"{data_path}/inputs/" r"Tomato_HarvestedArea_Percent_VegetablesPrimary_full.csv"
+    rf"{data_path}/inputs/Tomato_HarvestedArea_Percent_VegetablesPrimary_full.csv"
 )
 
 # Summary statistics
