@@ -4,23 +4,23 @@ from hpc.create_config_params import create_global_config_args
 from dotenv import load_dotenv
 
 # Model parameters
-sim_name = "tobrfv_lamdaWeights"
+sim_name = "tobrfv_120991"
 start_run = 0
-end_run = 2
+end_run = 3
 commodity_list = ["120991"]
-country_of_interest = "Mexico"
+country_of_interest = "MEX"
 native_countries_list = ["Israel", "Jordan"]
 
 # To keep one parameter static, pass it as a list e.g. alpha = [0.15]
-start_years = list(range(2012, 2014))
+start_years = list(range(2013, 2014))
 alphas = [round(a, 2) for a in list(np.arange(0.25, 0.55, 0.1))]
 betas = [round(b, 2) for b in list(np.arange(0.15, 0.50, 0.05))]
 lamdas = [round(l, 2) for l in list(np.arange(0.2, 3, 0.2))]
 
 # Transmission lag type
 transmission_lag_type = None
-gamma_shape = 2
-gamma_scale = 1
+gamma_shape = None
+gamma_scale = None
 threshold_val = 16
 scaled_min = 0.3
 scaled_max = 0.8
@@ -59,15 +59,14 @@ season_dict = {
 timestep = "monthly"
 data_path = "/share/rkmeente/cawalden/pops_global"
 lamda_weights_path = (
-    rf"{data_path}/inputs/"
-    r"Tomato_HarvestedArea_Percent_VegetablesPrimary_full.csv"
+    rf"{data_path}/inputs/" r"Tomato_HarvestedArea_Percent_VegetablesPrimary_full.csv"
 )
 
 # Summary statistics
 years_before_firstRecord = 50
 years_after_firstRecord = 0
 end_valid_year = 2020
-sim_years = [2014, 2023]  # list(range(2006,2035))
+sim_years = [2014, 2020]  # list(range(2006,2035))
 
 load_dotenv(os.path.join(".env"))
 project_loc = os.getenv("DATA_PATH")
@@ -96,5 +95,5 @@ create_global_config_args(
     years_after_firstRecord,
     end_valid_year,
     sim_years,
-    lamda_weights_path
+    lamda_weights_path,
 )

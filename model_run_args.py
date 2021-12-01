@@ -35,7 +35,7 @@ if __name__ == "__main__":
     lamda_weights_path = config["lamda_weights_path"]
     commodity_list = config["commodity_list"]
 
-    commodity = '-'.join(str(elem) for elem in commodity_list)
+    commodity = "-".join(str(elem) for elem in commodity_list)
 
     config_out_path = (
         rf"{os.getcwd()}"
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         time_to_infectivity=None,
         gamma_shape=None,
         gamma_scale=None,
-        random_seed=50,
+        random_seed=None,
         cols_to_drop=None,
         scenario_list=None,
         lamda_weights_path=lamda_weights_path,
