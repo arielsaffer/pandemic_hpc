@@ -63,7 +63,7 @@ if __name__ == "__main__":
         save_estab=False,
         save_intro=False,
         save_country_intros=False,
-        commodity_forecast_path=None,
+        commodity_forecast_path=input_dir + f"/comtrade/trade_forecast/{timestep}_adjusted/",
         season_dict=season_dict,
         transmission_lag_type=transmission_lag_type,
         time_to_infectivity=None,

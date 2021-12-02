@@ -47,9 +47,7 @@ def distance_between(shapefile):
     shapefile["centroid_lon"] = centroids.x
     shapefile["centroid_lat"] = centroids.y
     centroids_array = shapefile.loc[:, ["centroid_lon", "centroid_lat"]].values
-    distance_array = distance.cdist(
-        centroids_array, centroids_array, "euclidean"
-    )
+    distance_array = distance.cdist(centroids_array, centroids_array, "euclidean")
 
     return distance_array
 
@@ -79,9 +77,7 @@ def location_pairs_with_host(locations):
     )
     destinations = list(locations_with_host_df["ISO3"])
     origins_list = [
-        country for country in origins for i in range(
-            locations_with_host_df.shape[0]
-        )
+        country for country in origins for i in range(locations_with_host_df.shape[0])
     ]
     destinations_list = destinations * len(origins)
     location_tuples = list(zip(origins_list, destinations_list))
@@ -91,11 +87,7 @@ def location_pairs_with_host(locations):
     return location_tuples
 
 
-def filter_trades_list(
-    file_list,
-    start_year,
-    stop_year=None
-):
+def filter_trades_list(file_list, start_year, stop_year=None):
     """
     Returns filtered list of trade data based on start
     year
@@ -118,11 +110,9 @@ def filter_trades_list(
 
     """
     for i, f in enumerate(file_list):
-        date_tag = str.split(
-            os.path.splitext(os.path.split(f)[1])[0], "_"
-        )[-1][:4]
+        date_tag = str.split(os.path.splitext(os.path.split(f)[1])[0], "_")[-1][:4]
         # File time step before start year
-        if (int(date_tag) < int(start_year)):
+        if int(date_tag) < int(start_year):
             file_list[i] = None
         # File time step after stop year if specified
         if stop_year is not None and (int(date_tag) > int(stop_year)):
@@ -183,10 +173,11 @@ def create_trades_list(
 
     codes_available = [os.path.split(f)[1] for f in commodities_available]
 
-    code_list = (
-        [x for x in codes_available if x in commodity_list or
-            '-'.join(commodity_list) == codes_available]
-    )
+    code_list = [
+        x
+        for x in codes_available
+        if x in commodity_list or "-".join(commodity_list) == codes_available
+    ]
     skipped_codes = [x for x in commodity_list if x not in codes_available]
     print(f"\tProvided {commodity_list}, data available to format {code_list}")
     print(f"\t***SKIPPING: {skipped_codes}, data not in commodity_path")
@@ -199,29 +190,23 @@ def create_trades_list(
         file_list_historical = glob.glob(commodity_path + f"{code}/*.csv")
         file_list_historical.sort()
         if commodity_forecast_path is not None:
-            file_list_forecast = glob.glob(commodity_forecast_path + "/*.csv")
+            file_list_forecast = glob.glob(commodity_forecast_path + f"{code}/*.csv")
             file_list_forecast.sort()
             file_list = file_list_historical + file_list_forecast
         else:
             file_list = file_list_historical
 
         file_list_filtered = filter_trades_list(
-            file_list=file_list, start_year=start_year, stop_year=stop_year,
+            file_list=file_list,
+            start_year=start_year,
+            stop_year=stop_year,
         )
         trades = np.zeros(
-            shape=(
-                len(file_list_filtered),
-                distances.shape[0],
-                distances.shape[0]
-            )
+            shape=(len(file_list_filtered), distances.shape[0], distances.shape[0])
         )
         for i in range(len(file_list_filtered)):
             trades[i] = pd.read_csv(
-                file_list_filtered[i],
-                sep=",",
-                header=0,
-                index_col=0,
-                encoding="latin1"
+                file_list_filtered[i], sep=",", header=0, index_col=0, encoding="latin1"
             ).values
         trades_list.append(trades)
 
@@ -246,11 +231,7 @@ def create_trades_list(
                 file_list=file_list, start_year=start_year
             )
             trades = np.zeros(
-                shape=(
-                    len(file_list_filtered),
-                    distances.shape[0],
-                    distances.shape[0]
-                )
+                shape=(len(file_list_filtered), distances.shape[0], distances.shape[0])
             )
             for i in range(len(file_list_filtered)):
                 trades[i] = pd.read_csv(
@@ -265,7 +246,7 @@ def create_trades_list(
         print(
             rf"\tProvided: {commodity_list}",
             rf"\n\tOnly data for {codes_available} available",
-            r"\n\tNo trade data formatted"
+            r"\n\tNo trade data formatted",
         )
         file_list_filtered = None
 
@@ -296,7 +277,7 @@ def adjust_trade_scenario(T_ijct, scenario):
     """
     adjustment_type = scenario[0][3]
     adjustment_pct = scenario[0][4]
-    if adjustment_type == 'decrease':
+    if adjustment_type == "decrease":
         return T_ijct * (1 - adjustment_pct)
-    if adjustment_type == 'increase':
+    if adjustment_type == "increase":
         return T_ijct * (1 + adjustment_pct)
