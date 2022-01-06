@@ -1,3 +1,24 @@
+# PoPS Global - Network model of global pest introductions over time.
+# Copyright (C) 2019-2021 by the authors.
+
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, see https://www.gnu.org/licenses/gpl-2.0.html
+
+"""Runs the PoPS Global simulation using parameters from the environmental and
+configuration files, node locations, distance matrix, climate similarity
+matrix, and trade data.
+"""
+
 import json
 import os
 import sys
@@ -5,9 +26,8 @@ import geopandas
 import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
-
 from helpers import create_trades_list
-from model_equations_quiet import pandemic_multiple_time_steps
+from model_equations import pandemic_multiple_time_steps
 from output_files import (
     aggregate_monthly_output_to_annual,
     write_annual_output,
@@ -61,15 +81,13 @@ distances = np.load(input_dir + "/distance_matrix.npy")
 climate_similarities = np.load(input_dir + "/climate_similarities.npy")
 
 # Read & format trade data
-trades_list, file_list_filtered, code_list, commodities_available = (
-    create_trades_list(
-        commodity_list=commodity_list,
-        commodity_path=commodity_path,
-        commodity_forecast_path=commodity_forecast_path,
-        start_year=start_year,
-        stop_year=stop_year,
-        distances=distances,
-    )
+trades_list, file_list_filtered, code_list, commodities_available = create_trades_list(
+    commodity_list=commodity_list,
+    commodity_path=commodity_path,
+    commodity_forecast_path=commodity_forecast_path,
+    start_year=start_year,
+    stop_year=stop_year,
+    distances=distances,
 )
 
 # Create list of unique dates from trade data
@@ -119,10 +137,14 @@ for i in range(len(trades_list)):
 
     locations["Presence"] = pres_ts0
     locations["Infective"] = infect_ts0
-    iu1 = np.triu_indices(climate_similarities.shape[0], 1)
 
     sigma_h = (1 - countries["Host Percent Area"]).std()
-    sigma_kappa = np.std(1 - climate_similarities[iu1])
+
+    if len(climate_similarities.shape) == 1:
+        sigma_kappa = np.std(1 - climate_similarities)
+    else:
+        iu1 = np.triu_indices(climate_similarities.shape[0], 1)
+        sigma_kappa = np.std(1 - climate_similarities[iu1])
 
     np.random.seed(random_seed)
     lamda_c = lamda_c_list[i]
@@ -178,6 +200,7 @@ for i in range(len(trades_list)):
             write_intro_probs=save_intro,
             write_country_intros=save_country_intros,
         )
+
         full_out_df = save_model_output(
             model_output_object=e,
             example_trade_matrix=traded,
@@ -200,6 +223,8 @@ for i in range(len(trades_list)):
         if len(date_list[i]) == 4:
             print("exporting annual predictions...")
             write_annual_output(formatted_geojson=full_out_df, outpath=outpath)
+        # Save model metadata to text file
+        print("writing model metadata...")
         write_model_metadata(
             main_model_output=e[0],
             alpha=alpha,
@@ -213,10 +238,10 @@ for i in range(len(trades_list)):
             start_year=start_year,
             end_sim_year=end_sim_year,
             transmission_lag_type=transmission_lag_type,
-            time_infect=time_infect,
             gamma_shape=gamma_shape,
             gamma_scale=gamma_scale,
             random_seed=random_seed,
+            time_infect=time_infect,
             native_countries_list=native_countries_list,
             countries_path=countries_path,
             commodity=code,
@@ -225,7 +250,7 @@ for i in range(len(trades_list)):
             outpath=outpath,
             run_num=run_num,
             scenario_list=scenario_list,
-            lamda_weights_path=lamda_weights_path
+            lamda_weights_path=lamda_weights_path,
         )
     else:
         print("\tskipping as pest is not transported with this commodity")
