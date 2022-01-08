@@ -1,14 +1,13 @@
 import os
 
 project_loc = os.getcwd()
-shared_loc = "/share/rkmeente/cawalden/pops_global"
 input = "/inputs"
 output = "/outputs"
 countries_file = "/countries.gpkg"
 
 with open(".env", "w") as f:
-    f.write(f"DATA_PATH='{shared_loc}'\n")
-    f.write(f"INPUT_PATH='{shared_loc}{input}'\n")
-    f.write(f"OUTPUT_PATH='{shared_loc}{output}'\n")
-    f.write(f"COUNTRIES_PATH='{shared_loc}{input}{countries_file}'\n")
+    f.write(f"DATA_PATH='{project_loc}'\n")
+    f.write(f"INPUT_PATH='{project_loc}{input}'\n")
+    f.write(f"OUTPUT_PATH='{project_loc}{output}'\n")
+    f.write(f"COUNTRIES_PATH='{project_loc}{input}{countries_file}'\n")
     f.close()
