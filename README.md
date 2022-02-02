@@ -6,7 +6,7 @@ This is a version of the [Pandemic model](https://github.com/ncsu-landscape-dyna
 
 1. All paths are relative to the parent directory.
 2. The model script is run from command line with five additional arguments: alpha, lamda, start year, start run (ie. 0), end run (eg. 49).
-3. Parallel processing with multiprocess and subprocess is limited by setting the Pool to 1. Multiple commands are instead submitted using [pynodelauncher](https://github.com/ncsu-landscape-dynamics/pynodelauncher), a Python adaptation of [launch](https://github.ncsu.edu/lllowe/launch), which administers the tasks in parallel across the cores requested from HPC.
+3. Parallel processing with multiprocess and subprocess is limited by setting the Pool to 1. Multiple commands are instead submitted using [launch](https://github.ncsu.edu/lllowe/launch), which administers the tasks in parallel across the cores requested from HPC. Before starting the below, [clone and compile launch](https://github.ncsu.edu/lllowe/launch) in the same directory where you will clone this repository. 
 This, 
     1. allows for the use of distributed (vs. shared) memory, and 
     2. prevents the model from spawning additional threads that could affect the performance of other jobs on shared nodes.
@@ -20,6 +20,7 @@ Clone this repository to HPC (recommended: to /share/$GROUP/$USER)
 git clone https://github.com/ncsu-landscape-dynamics/pandemic_hpc
 cd pandemic_hpc
 ```
+
 Run the [Pandemic Data Acquisition notebook](https://github.com/ncsu-landscape-dynamics/Pandemic_Model/blob/master/notebooks/1_data_acquisition_format.ipynb) locally and copy to the "inputs" directory.
 
 So that you don't need to edit file names within the scripts, name input files as follows:
