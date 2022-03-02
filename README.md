@@ -6,7 +6,7 @@ This is a version of the [Pandemic model](https://github.com/ncsu-landscape-dyna
 
 1. All paths are relative to the parent directory.
 2. The model script is run from command line with five additional arguments: alpha, lamda, start year, start run (ie. 0), end run (eg. 49).
-3. Parallel processing with multiprocess and subprocess is limited by setting the Pool to 1. Multiple commands are instead submitted using [pynodelauncher](https://github.com/ncsu-landscape-dynamics/pynodelauncher), a Python adaptation of [launch](https://github.ncsu.edu/lllowe/launch), which administers the tasks in parallel across the cores requested from HPC.
+3. Parallel processing with multiprocess and subprocess is limited by setting the Pool to 1. Multiple commands are instead submitted using [launch](https://github.ncsu.edu/lllowe/launch), which administers the tasks in parallel across the cores requested from HPC. Before starting the below, [clone and compile launch](https://github.ncsu.edu/lllowe/launch) in the same directory where you will clone this repository. 
 This, 
     1. allows for the use of distributed (vs. shared) memory, and 
     2. prevents the model from spawning additional threads that could affect the performance of other jobs on shared nodes.
@@ -20,6 +20,7 @@ Clone this repository to HPC (recommended: to /share/$GROUP/$USER)
 git clone https://github.com/ncsu-landscape-dynamics/pandemic_hpc
 cd pandemic_hpc
 ```
+
 Run the [Pandemic Data Acquisition notebook](https://github.com/ncsu-landscape-dynamics/Pandemic_Model/blob/master/notebooks/1_data_acquisition_format.ipynb) locally and copy to the "inputs" directory.
 
 So that you don't need to edit file names within the scripts, name input files as follows:
@@ -39,9 +40,14 @@ To set up the environment and write the commands that will be run, submit (1) hp
 bsub < submit_setup.csh 
 ```
 
-Modify or copy 'submit_launch.csh' to adjust the resources requested (especially -n and -W). If you are in the landscape-dynamics lab group, the conda environment has already been created on HPC and is referenced in 'submit_launch.csh'. If you are not, the conda commands to set it up are included below.
+Modify or copy 'submit_launch.csh' to adjust the resources requested (especially -n and -W). If you are in the landscape-dynamics lab group, the conda environment has already been created on HPC and is referenced in 'submit_launch.csh'. If you are not, the conda commands to set it up are included below. 
+
+*Note: If you will write output to temporary files, run the command ```chmod u+x ./hpc/wrapper_script.csh``` before your first use to give permission to execute the wrapper script.*
 
 Submit the script.
+```
+bsub < submit_launch.csh 
+```
 
 Once your job is complete, if it finished without error, you can calculate the summary statistics. If the job was cut short by the time limit, you may need to resume runs. To check which runs were completed and write out commands for missing runs, adjust and submit 'submit_check.csh', which will run 'run_checker,py'. 
 

@@ -41,9 +41,10 @@ load_dotenv(os.path.join(".env"))
 data_dir = os.getenv("DATA_PATH")
 input_dir = os.getenv("INPUT_PATH")
 out_dir = os.getenv("OUTPUT_PATH")
+temp_dir = os.getenv("TEMP_OUTPATH")
 countries_path = os.getenv("COUNTRIES_PATH")
 
-# Read model arguments from configuration file
+# Read pandemic arguments from configuration file
 path_to_config_json = sys.argv[1]
 with open(path_to_config_json) as json_file:
     config = json.load(json_file)
@@ -75,6 +76,18 @@ save_intro = config["save_intro"]
 save_country_intros = config["save_country_intros"]
 scenario_list = config["scenario_list"]
 lamda_weights_path = config["lamda_weights_path"]
+
+with open("config.json") as json_file:
+    config = json.load(json_file)
+
+model_files = config["model_files"]
+
+# If writing to a temporary directory
+if model_files == "Temp":
+    temp_dir = os.getenv("TEMP_OUTPATH")
+    out_dir = f"{temp_dir}/samp{alpha}_{lamda_c_list[0]}_{start_year}"
+else:
+    out_dir = os.getenv("OUTPUT_PATH")
 
 countries = geopandas.read_file(countries_path, driver="GPKG")
 distances = np.load(input_dir + "/distance_matrix.npy")

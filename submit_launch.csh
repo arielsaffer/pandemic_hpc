@@ -7,5 +7,5 @@
 module load PrgEnv-intel
 module load conda
 conda activate /usr/local/usrapps/rkmeente/env_pandemic
-mpiexec python -m mpi4py -m pynodelauncher commands.txt
+mpirun ../launch/launch commands.txt
 conda deactivate
