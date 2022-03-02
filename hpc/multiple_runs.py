@@ -37,10 +37,18 @@ def create_params(
         config_file_path, ((iteration_end + 1) - iteration_start)
     )
     sim_name = np.repeat(sim_name, ((iteration_end + 1) - iteration_start))
-    add_descript = np.repeat(add_descript, ((iteration_end + 1) - iteration_start))
+    add_descript = np.repeat(
+        add_descript, ((iteration_end + 1) - iteration_start)
+        )
     run_num = range(iteration_start, iteration_end + 1, 1)
     param_list = list(
-        zip(model_script_path, config_file_path, sim_name, add_descript, run_num)
+        zip(
+            model_script_path,
+            config_file_path,
+            sim_name,
+            add_descript,
+            run_num,
+            )
     )
     return param_list
 

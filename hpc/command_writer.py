@@ -11,9 +11,10 @@ def write_commands(model_files, params, start_run, end_run):
         " ".join(
             [
                 script,
-                str(params[0]),
-                str(params[1]),
-                str(params[2]),
+                str(params[0]), # alpha
+                str(params[1]), # beta
+                str(params[2]), # lamda
+                str(params[3]), # start year
                 str(start_run),
                 str(end_run),
             ]
@@ -29,10 +30,11 @@ if __name__ == "__main__":
         config = json.load(json_file)
     start_years = config["start_years"]
     alphas = config["alphas"]
+    betas = config["betas"]
     lamdas = config["lamdas"]
     model_files = config["model_files"]
 
-    param_list = [alphas, lamdas, start_years]
+    param_list = [alphas, betas, lamdas, start_years]
     param_sets = list(itertools.product(*param_list))
 
     # Full run

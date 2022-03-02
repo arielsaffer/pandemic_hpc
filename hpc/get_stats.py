@@ -7,12 +7,14 @@ from dotenv import load_dotenv
 import json
 from summary_stats import compute_stat_wrapper_func, mse, f1, fbeta, avg_std
 
+
 if __name__ == "__main__":
 
     with open("config.json") as json_file:
         config = json.load(json_file)
     sim_name = config["sim_name"]
-    commodity = f"{config['start_commodity']}-{config['end_commodity']}"
+    commodity = "-".join(str(elem) for elem in config["commodity_list"])
+
     coi = config["country_of_interest"]
     native_countries_list = config["native_countries_list"]
     model_files = config["model_files"]
@@ -29,6 +31,7 @@ if __name__ == "__main__":
         out_dir = os.getenv("OUTPUT_PATH")
 
     param_samp = glob.glob(f"{out_dir}/{sim_name}/*{commodity}*")
+
     validation_df = pd.read_csv(
         input_dir + "/first_records_validation.csv", header=0, index_col=0,
     )
@@ -53,6 +56,7 @@ if __name__ == "__main__":
             "run_num",
             "start",
             "alpha",
+            "beta",
             "lamda",
             "total_countries_intros_predicted",
             "diff_total_countries",
@@ -146,6 +150,7 @@ if __name__ == "__main__":
     agg_dict = {
         "start": ["max"],
         "alpha": ["max"],
+        "beta": ["max"],
         "lamda": ["max"],
         "total_countries_intros_predicted": ["mean", "std"],
         "diff_total_countries": ["mean", "std"],
@@ -173,14 +178,4 @@ if __name__ == "__main__":
     agg_df = data.groupby("sample").agg(agg_dict)
 
     agg_df.columns = ["_".join(x) for x in agg_df.columns.values]
-    # agg_df.to_csv(summary_stat_path + "/summary_stats_bySample.csv")
-
-    if os.path.isfile(summary_stat_path + "/summary_stats_bySample.csv"):
-        agg_df.to_csv(
-            summary_stat_path + "/summary_stats_bySample.csv",
-            mode="a",
-            index=False,
-            header=False,
-        )
-    else:
-        agg_df.to_csv(summary_stat_path + "/summary_stats_bySample.csv", index=False)
+    agg_df.to_csv(summary_stat_path + "/summary_stats_bySample.csv")

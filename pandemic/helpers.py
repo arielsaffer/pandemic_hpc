@@ -87,11 +87,7 @@ def location_pairs_with_host(locations):
     return location_tuples
 
 
-def filter_trades_list(
-    file_list,
-    start_year,
-    stop_year=None
-):
+def filter_trades_list(file_list, start_year, stop_year=None):
     """
     Returns filtered list of trade data based on start
     year
@@ -116,7 +112,7 @@ def filter_trades_list(
     for i, f in enumerate(file_list):
         date_tag = str.split(os.path.splitext(os.path.split(f)[1])[0], "_")[-1][:4]
         # File time step before start year
-        if (int(date_tag) < int(start_year)):
+        if int(date_tag) < int(start_year):
             file_list[i] = None
         # File time step after stop year if specified
         if stop_year is not None and (int(date_tag) > int(stop_year)):
@@ -127,6 +123,7 @@ def filter_trades_list(
 
 
 def create_trades_list(
+    commodity_list,
     commodity_path,
     commodity_forecast_path,
     start_year,
@@ -140,6 +137,8 @@ def create_trades_list(
 
     Parameters:
     -----------
+    commodity_list : list
+        list of commodities for which to run the model
     commodity_path : str
         path to all historical commodity trade data
     commodity_forecast_path : str
@@ -171,22 +170,36 @@ def create_trades_list(
     commodities_available.sort()
     trades_list = []
     print("Loading and formatting trade data...")
+
+    codes_available = [os.path.split(f)[1] for f in commodities_available]
+
+    code_list = [
+        x
+        for x in codes_available
+        if x in commodity_list or "-".join(commodity_list) == codes_available
+    ]
+    skipped_codes = [x for x in commodity_list if x not in codes_available]
+    print(f"\tProvided {commodity_list}, data available to format {code_list}")
+    print(f"\t***SKIPPING: {skipped_codes}, data not in commodity_path")
+
     # If trade data are aggregated (i.e., summed across
     # multiple commodity codes)
-    if len(commodities_available) == 1:
-        code_list = [os.path.split(f)[1] for f in commodities_available]
-        print("\t", commodities_available)
-        file_list_historical = glob.glob(commodity_path + "/*.csv")
+    if len(code_list) == 1:
+        code = code_list[0]
+        print(f"\t\tFormatting HS:{code}...")
+        file_list_historical = glob.glob(commodity_path + f"{code}/*.csv")
         file_list_historical.sort()
         if commodity_forecast_path is not None:
-            file_list_forecast = glob.glob(commodity_forecast_path + "/*.csv")
+            file_list_forecast = glob.glob(commodity_forecast_path + f"{code}/*.csv")
             file_list_forecast.sort()
             file_list = file_list_historical + file_list_forecast
         else:
             file_list = file_list_historical
 
         file_list_filtered = filter_trades_list(
-            file_list=file_list, start_year=start_year, stop_year=stop_year,
+            file_list=file_list,
+            start_year=start_year,
+            stop_year=stop_year,
         )
         trades = np.zeros(
             shape=(len(file_list_filtered), distances.shape[0], distances.shape[0])
@@ -196,12 +209,12 @@ def create_trades_list(
                 file_list_filtered[i], sep=",", header=0, index_col=0, encoding="latin1"
             ).values
         trades_list.append(trades)
+
     # If trade data are stored by HS code
-    else:
-        for i in range(len(commodities_available)):
-            code_list = [os.path.split(f)[1] for f in commodities_available]
+    elif len(code_list) > 1:
+        for i in range(len(code_list)):
             code = code_list[i]
-            print("\t", commodities_available[i])
+            print(f"\t\tFormatting HS:{code}...")
             file_list_historical = glob.glob(commodity_path + f"/{code}/*.csv")
             file_list_historical.sort()
 
@@ -229,6 +242,13 @@ def create_trades_list(
                     encoding="latin1",
                 ).values
             trades_list.append(trades)
+    else:
+        print(
+            rf"\tProvided: {commodity_list}",
+            rf"\n\tOnly data for {codes_available} available",
+            r"\n\tNo trade data formatted",
+        )
+        file_list_filtered = None
 
     return trades_list, file_list_filtered, code_list, commodities_available
 
@@ -244,9 +264,10 @@ def adjust_trade_scenario(T_ijct, scenario):
         Original value/volume of trade between origin and destination.
         of commodity c at time t.
     scenario : list
-        Nested list of scenario elements, with elements ordered as: year (YYYY),
-        origin ISO3 code, destination ISO3 code, adjustment type (e.g.,
-        "increase", "decrease"), and adjustment percent.
+        Nested list of scenario elements, with elements ordered as:
+        year (YYYY), origin ISO3 code, destination ISO3 code,
+        adjustment type (e.g., "increase", "decrease"), and
+        adjustment percent.
 
     Returns:
     --------
@@ -256,7 +277,7 @@ def adjust_trade_scenario(T_ijct, scenario):
     """
     adjustment_type = scenario[0][3]
     adjustment_pct = scenario[0][4]
-    if adjustment_type == 'decrease':
+    if adjustment_type == "decrease":
         return T_ijct * (1 - adjustment_pct)
-    if adjustment_type == 'increase':
+    if adjustment_type == "increase":
         return T_ijct * (1 + adjustment_pct)

@@ -8,12 +8,12 @@ def create_global_config_args(
     sim_name,
     start_run,
     end_run,
-    start_commodity,
-    end_commodity,
+    commodity_list,
     country_of_interest,
     native_countries_list,
     start_years,
     alphas,
+    betas,
     lamdas,
     transmission_lag_type,
     gamma_shape,
@@ -27,6 +27,8 @@ def create_global_config_args(
     years_after_firstRecord,
     end_valid_year,
     sim_years,
+    lamda_weights_path=None,
+    scenario_list=None,
 ):
 
     args = {}
@@ -38,13 +40,16 @@ def create_global_config_args(
     args["sim_name"] = sim_name
     args["start_run"] = start_run
     args["end_run"] = end_run
-    args["start_commodity"] = start_commodity
-    args["end_commodity"] = end_commodity
+    args["commodity_list"] = commodity_list
+    # args["start_commodity"] = start_commodity
+    # args["end_commodity"] = end_commodity
     args["country_of_interest"] = country_of_interest
     args["native_countries_list"] = native_countries_list
     args["start_years"] = start_years
     args["alphas"] = alphas
+    args["betas"] = betas
     args["lamdas"] = lamdas
+    args["lamda_weights_path"] = lamda_weights_path
     args["transmission_lag_type"] = transmission_lag_type
     args["gamma_shape"] = gamma_shape
     args["gamma_scale"] = gamma_scale
@@ -57,9 +62,10 @@ def create_global_config_args(
     args["years_after_firstRecord"] = years_after_firstRecord
     args["end_valid_year"] = end_valid_year
     args["sim_years"] = sim_years
+    args["scenario_list"] = scenario_list
 
     # Write arguments to json file
-    config_json_path = project_loc + "/config.json"
+    config_json_path = "config.json"
     with open(config_json_path, "w") as file:
         json.dump(args, file, indent=4)
     print("\tSaved ", config_json_path)

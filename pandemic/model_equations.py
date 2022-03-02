@@ -1,19 +1,20 @@
-"""
-PoPS Pandemic - Simulation
+# PoPS Global - Network model of global pest introductions and spread over time.
+# Copyright (C) 2019-2021 by the authors.
 
-Module containing all calcualtions for the Pandemic pandemic
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
 
-Copyright (C) 2019-2020 by the authors.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
 
-Authors: Chris Jones (cmjone25 ncsu edu)
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, see https://www.gnu.org/licenses/gpl-2.0.html
 
-The code contained herein is licensed under the GNU General Public
-License. You may obtain a copy of the GNU General Public License
-Version 3 or later at the following locations:
-
-http://www.opensource.org/licenses/gpl-license.html
-http://www.gnu.org/copyleft/gpl.html
-"""
+"""Module containing functions to run the PoPS Global simulation."""
 
 import numpy as np
 import pandas as pd
@@ -46,26 +47,25 @@ def pandemic_single_time_step(
     time_step,
     season_dict,
     transmission_lag_type,
-    time_infect_units,
     time_infect,
     gamma_shape,
     gamma_scale,
     scenario_list=None,
+    lamda_weights=None,
 ):
     """
     Returns the probability of establishment, probability of entry, and
-    probability of introduction as an n x n matrices betweem every origin (i)
-    and destination (j) and update species presence and the combined
-    probability of presence for each origin (i) given climate similarity
-    between (i and j), host area in (j), ecological distrubance in (j), degree
+    probability of introduction as n x n matrices betweem every origin (i)
+    and destination (j) and updates species presence and the combined
+    probability of presence for each origin (i) given climate similarity,
+    host area in (j), ecological distrubance in (j), degree
     of polyphagy of the pest species, trade volumes, distance, and
     phytosanitary capacity.
-
     Parameters
     ----------
     locations : data_frame
-        data frame of countries, species presence, phytosanitry capacity,
-        koppen climate classifications % of total area for each class.
+        data frame of nodes with species presence, phytosanitry capacity,
+        % of total area for each koppen climate class
     locations_list : list
         list of possible location tuples (origin, destination) pairs with
         corresponding attributes where the origin is capable of transmitting
@@ -78,8 +78,9 @@ def pandemic_single_time_step(
         n x n matrix of distances from one location to another where n is
         number of locations.
     climate_similarities : data_frame
-        n x n matrix of climate similarity calculations between locations
-        where n is the number of locations
+        n x n or n x 1 matrix of climate similarity calculations between locations
+        where n is the number of locations. May be similarity between origin-destination
+        pairs or between initial origins and destinations
     alpha : float
         A parameter that allows the equation to be adapated to various discrete
         time steps
@@ -98,9 +99,6 @@ def pandemic_single_time_step(
         The climate dissimilarity normalizing constant
     sigma_h : float
         The host normalizing constant
-    phi : int
-        The degree of polyphagy of the pest of interest described as the number
-        of host families
     w_phi : int
         The degree of polyphagy weight
     min_Tc : float
@@ -119,10 +117,8 @@ def pandemic_single_time_step(
     transmission_lag_type : str
         Type of transmission lag used in the simulation (i.e., None,
         static, or stochastic)
-    time_infect_units : str
-        Units associated with the transmission lag value (i.e., years, months)
     time_infect : int
-        Time until a country is infectious, set for static transmission lag
+        Time until a node is infectious, set for static transmission lag
     gamma_shape : float
         Shape parameter for gamma distribution used in stochastic transmission
     gamma_scale : float
@@ -131,17 +127,19 @@ def pandemic_single_time_step(
         Nested list of scenarios, with elements ordered as: year (YYYY),
         origin ISO3 code, destination ISO3 code, adjustment type (e.g.,
         "increase", "decrease"), and adjustment percent.
-
+    lamda_weights : data frame (optional)
+        Dataframe of weights applied to lamda when the commodity of interest
+        is aggregated with others in the HS code (e.g., tomato seed grouped
+        with vegetable seed in Comtrade data). Value can be the proportion
+        of the import thought to be the commodity of interest.
     Returns
     -------
     probability_of_establishment : float
         The probability of a pest to establish in the origin location
-
     See Also
     probability_of_entry : Calculates the probability of entry
     probability_of_introduction : Calculates the probability of introduction
         from the probability_of_establishment and probability_of_entry
-
     """
 
     establishment_probabilities = np.zeros_like(trade, dtype=float)
@@ -208,7 +206,7 @@ def pandemic_single_time_step(
         # if monthly, parse dates to determine if species is in the
         # correct life cycle to be transported (set value to 1),
         # based on the geographic location of the origin
-        # country (i.e., Northern or Southern Hemisphere)
+        # node (i.e., Northern or Southern Hemisphere)
         if len(time_step) > 4:
             if origin["LAT"] >= 0 and time_step[-2:] not in season_dict["NH_season"]:
                 chi_it = 0
@@ -221,17 +219,26 @@ def pandemic_single_time_step(
 
         h_jt = 1 - destination["Host Percent Area"]
 
-        # check if species is present in origin country
+        # check if species is present in origin node
         # and sufficient time has passed to faciliate transmission
         if (origin["Infective"] is not None) and (
             int(time_step) >= int(origin["Infective"])
         ):
             zeta_it = 1
-            delta_kappa_ijt = 1 - climate_similarities[j, i]
+            if len(climate_similarities.shape) == 1:
+                delta_kappa_ijt = 1 - climate_similarities[j]
+            else:
+                delta_kappa_ijt = 1 - climate_similarities[j, i]
 
             if T_ijct == 0:
                 probability_of_entry_ijct = 0
             else:
+                if lamda_weights is not None:
+                    lamda_c_weight = lamda_weights[
+                        lamda_weights["ISO3"] == destination["ISO3"]
+                    ]["lamda_weight_scaled"].values[0]
+                else:
+                    lamda_c_weight = 0
                 probability_of_entry_ijct = probability_of_entry(
                     rho_i,
                     rho_j,
@@ -243,6 +250,7 @@ def pandemic_single_time_step(
                     mu,
                     d_ij,
                     chi_it,
+                    lamda_c_weight,
                 )
             probability_of_establishment_ijt = probability_of_establishment(
                 alpha, beta, delta_kappa_ijt, sigma_kappa, h_jt, sigma_h, phi, w_phi,
@@ -376,27 +384,25 @@ def pandemic_multiple_time_steps(
     date_list,
     season_dict,
     transmission_lag_type,
-    time_infect_units,
     time_infect,
     gamma_shape,
     gamma_scale,
     scenario_list=None,
+    lamda_weights=None,
 ):
-
     """
     Returns the probability of establishment, probability of entry, and
-    probability of introduction as an n x n matrices betweem every origin (i)
-    and destination (j) and update species presence and the combined
-    probability of presence for each origin (i) given climate similarity
-    between (i and j), host area in (j), ecological distrubance in (j), degree
+    probability of introduction as n x n matrices betweem every origin (i)
+    and destination (j) and updates species presence and the combined
+    probability of presence for each origin (i) given climate similarity,
+    host area in (j), ecological distrubance in (j), degree
     of polyphagy of the pest species, trade volumes, distance, and
     phytosanitary capacity.
-
     Parameters
     ----------
     locations : data_frame
-        data frame of countries, species presence, phytosanitry capacity,
-        koppen climate classifications % of total area for each class.
+        data frame of nodes with species presence, phytosanitry capacity,
+        % of total area for each koppen climate class
     trades : numpy.array
         list (c) of n x n x t matrices where c is the # of commoditites,
         n is the number of locations, and t is # of time steps
@@ -404,8 +410,9 @@ def pandemic_multiple_time_steps(
         n x n matrix of distances from one location to another where n is
         number of locations.
     climate_similarities : data_frame
-        n x n matrix of climate similarity calculations between locations
-        where n is the number of locations
+        n x n or n x 1 matrix of climate similarity calculations between locations
+        where n is the number of locations. May be similarity between origin-destination
+        pairs or between initial origins and destinations
     alpha : float
         A parameter that allows the equation to be adapated to various discrete
         time steps
@@ -437,10 +444,8 @@ def pandemic_multiple_time_steps(
     transmission_lag_type : str
         Type of transmission lag used in the simulation (i.e., None,
         static, or stochastic)
-    time_infect_units : str
-        Units associated with the transmission lag value (i.e., years, months)
     time_infect : int
-        Time until a country is infectious, set for static transmission lag
+        Time until a node is infectious, set for static transmission lag
     gamma_shape : float
         Shape parameter for gamma distribution used in stochastic transmission
     gamma_scale: float
@@ -449,12 +454,10 @@ def pandemic_multiple_time_steps(
         Nested list of scenarios, with elements ordered as: year (YYYY),
         origin ISO3 code, destination ISO3 code, adjustment type (e.g.,
         "increase", "decrease"), and adjustment percent.
-
     Returns
     -------
     probability_of_establishment : float
         The probability of a pest to establish in the origin location
-
     See Also
     probability_of_entry : Calculates the probability of entry
     probability_of_introduction : Calculates the probability of introduction
@@ -519,11 +522,11 @@ def pandemic_multiple_time_steps(
             time_step=ts,
             season_dict=season_dict,
             transmission_lag_type=transmission_lag_type,
-            time_infect_units=time_infect_units,
             time_infect=time_infect,
             gamma_shape=gamma_shape,
             gamma_scale=gamma_scale,
             scenario_list=scenario_list,
+            lamda_weights=lamda_weights,
         )
 
         establishment_probabilities[t] = ts_out[1]

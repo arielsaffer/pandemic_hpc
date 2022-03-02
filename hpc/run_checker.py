@@ -11,7 +11,7 @@ from command_writer import write_commands
 def complete_run_check(param_sample):
     # Empty dataframe for completed runs
     completed_runs = pd.DataFrame(
-        {"start": [0], "alpha": [0], "lamda": [0], "run": [0]}
+        {"start": [0], "alpha": [0], "beta": [0], "lamda": [0], "run": [0]}
     )
 
     # Which runs were completed
@@ -20,6 +20,7 @@ def complete_run_check(param_sample):
         # "\\" to run locally, "/" on HPC or with multiprocess
         start = sample.split("year")[1].split("_")[0]
         alpha = sample.split("alpha")[1].split("_")[0]
+        beta = sample.split("beta")[1].split("_")[0]
         lamda = sample.split("lamda")[1].split("_")[0]
         run_outputs = glob.glob(f"{param}/run*/origin_destination.csv")
         runs = []
@@ -29,7 +30,13 @@ def complete_run_check(param_sample):
             runs.append(int(indiv))
         for run in runs:
             completed_runs = completed_runs.append(
-                pd.Series({"start": start, "alpha": alpha, "lamda": lamda, "run": run}),
+                pd.Series({
+                    "start": start,
+                    "alpha": alpha,
+                    "beta": beta,
+                    "lamda": lamda,
+                    "run": run
+                }),
                 ignore_index=True,
             )
     # Write it to a .csv for safe keeping
@@ -42,12 +49,13 @@ def complete_run_check(param_sample):
 def pending_run_check(completed_runs, param_sets, full_set):
     results = []
     for param_set in param_sets:
-        alpha, lamda, start = param_set
+        alpha, beta, lamda, start = param_set
         complete_runs = set(
             completed_runs.loc[
                 (completed_runs["start"] == start)
                 & (completed_runs["lamda"] == lamda)
                 & (completed_runs["alpha"] == alpha)
+                & (completed_runs["beta"] == beta)
             ]["run"]
         )
         missing_runs = full_set - complete_runs
@@ -61,6 +69,7 @@ def run_checker(param_sample):
     with open("config.json") as json_file:
         config = json.load(json_file)
     alphas = config["alphas"]
+    betas = config["betas"]
     lamdas = config["lamdas"]
     start_years = config["start_years"]
     start_run = config["start_run"]
@@ -68,7 +77,7 @@ def run_checker(param_sample):
     model_files = config["model_files"]
 
     # Recreate the full parameter set used for the runs
-    param_list = [alphas, lamdas, start_years]
+    param_list = [alphas, betas, lamdas, start_years]
     param_sets = list(itertools.product(*param_list))
 
     # Two methods to check runs:
@@ -90,6 +99,7 @@ def run_checker(param_sample):
                 (param_sample["start_max"] == start)
                 & (param_sample["lamda_max"] == lamda)
                 & (param_sample["alpha_max"] == alpha)
+                & (param_sample["beta_max"] == beta)
             ]
             if len(completed.index) == 0:
                 pending_runs.append([param_set, set([start_run, end_run])])
@@ -102,7 +112,7 @@ if __name__ == "__main__":
     with open("config.json") as json_file:
         config = json.load(json_file)
     sim_name = config["sim_name"]
-    commodity = f"{config['start_commodity']}-{config['end_commodity']}"
+    commodity = '-'.join(str(elem) for elem in config["commodity_list"])
     model_files = config["model_files"]
 
     # Data paths from env
@@ -110,6 +120,7 @@ if __name__ == "__main__":
     data_dir = os.getenv("DATA_PATH")
     input_dir = os.getenv("INPUT_PATH")
     out_dir = os.getenv("OUTPUT_PATH")
+
     if model_files == "Temp":
         param_sample = pd.read_csv(
             f'{os.getenv("OUTPUT_PATH")}/summary_stats/{sim_name}/summary_stats_bySample.csv',

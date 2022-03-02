@@ -7,12 +7,13 @@ from pandemic.create_config_params import create_config_args
 from hpc.multiple_runs import create_params, execute_model_runs
 
 if __name__ == "__main__":
-    alpha, lamda_c_list, start_year, start_run, num_runs = [
+    alpha, beta, lamda_c_list, start_year, start_run, num_runs = [
         float(sys.argv[1]),
-        [float(sys.argv[2])],
-        int(sys.argv[3]),
+        float(sys.argv[2]),
+        [float(sys.argv[3])],
         int(sys.argv[4]),
         int(sys.argv[5]),
+        int(sys.argv[6]),
     ]
 
     with open("config.json") as json_file:
@@ -30,8 +31,10 @@ if __name__ == "__main__":
     scaled_max = config["scaled_max"]
     timestep = config["timestep"]
     season_dict = config["season_dict"]
+    lamda_weights_path = config["lamda_weights_path"]
+    commodity_list = config["commodity_list"]
 
-    commodity = f"{config['start_commodity']}-{config['end_commodity']}"
+    commodity = "-".join(str(elem) for elem in commodity_list)
 
     load_dotenv(os.path.join(".env"))
     input_dir = os.getenv("INPUT_PATH")
@@ -43,16 +46,24 @@ if __name__ == "__main__":
         out_dir = os.getenv("OUTPUT_PATH")
 
     config_out_path = (
+
+        rf"year{start_year}_alpha{alpha}"
+        rf"_beta{beta}"
+        rf"_lamda{lamda_c_list[0]}"
         rf"{out_dir}/config/"
-        rf"year{start_year}_alpha{alpha}_lamda{lamda_c_list[0]}"
+        rf"year{start_year}_alpha{alpha}"
+        rf"_beta{beta}"
+        rf"_lamda{lamda_c_list[0]}"
         rf"_{commodity}/config.json"
     )
 
     param_vals, config_file_path = create_config_args(
         config_out_path=config_out_path,
-        commodity_path=input_dir + f"/comtrade/{timestep}_agg/{commodity}",
+        commodity_list=commodity_list,
+        commodity_path=input_dir + f"/comtrade/{timestep}_adjusted/",
         native_countries_list=native_countries_list,
         alpha=alpha,
+        beta=beta,
         mu=0,
         lamda_c_list=lamda_c_list,
         phi=1,
@@ -63,16 +74,16 @@ if __name__ == "__main__":
         save_estab=False,
         save_intro=False,
         save_country_intros=False,
-        commodity_forecast_path=(
-            input_dir + f"/comtrade/trade_forecast/{timestep}_agg/{commodity}"
-        ),
+        commodity_forecast_path=input_dir + f"/comtrade/trade_forecast/{timestep}_adjusted/",
         season_dict=season_dict,
         transmission_lag_type=transmission_lag_type,
         time_to_infectivity=None,
-        gamma_shape=gamma_shape,
-        gamma_scale=gamma_scale,
+        gamma_shape=None,
+        gamma_scale=None,
         random_seed=None,
         cols_to_drop=None,
+        scenario_list=None,
+        lamda_weights_path=lamda_weights_path,
     )
 
     param_list = create_params(
@@ -82,6 +93,7 @@ if __name__ == "__main__":
         add_descript=(
             rf"year{param_vals['start_year']}_"
             rf"alpha{param_vals['alpha']}_"
+            rf"beta{param_vals['beta']}_"
             rf"lamda{param_vals['lamda_c_list'][0]}"
         ),
         iteration_start=start_run,

@@ -13,8 +13,7 @@ quiet_time = True  # True or False
 sim_name = "mln_eqn_test"
 start_run = 0
 end_run = 5
-start_commodity = 100510
-end_commodity = 100510
+commodity_list = ["100510"]
 country_of_interest = "KEN"
 native_countries_list = [
     "Peru",
@@ -28,7 +27,14 @@ native_countries_list = [
 # To keep one parameter static, pass it as a list e.g. alpha = [0.15]
 start_years = list(range(2000, 2010))
 alphas = [round(a, 2) for a in list(np.arange(0.05, 1, 0.1))]
+betas = [0.5]
 lamdas = [round(l, 2) for l in list(np.arange(0.05, 1, 0.1))]
+
+# Lamda weights, if relevant
+lamda_weights_path = None
+# lamda_weights_path = (
+#     rf"{data_path}/inputs/Area_Percent.csv"
+# )
 
 # Transmission lag type
 transmission_lag_type = "stochastic"
@@ -69,12 +75,12 @@ season_dict = {
     ],
 }
 
-timestep = "annual"
+timestep = "annual" # options: annual or monthly
 
 # Summary statistics
-years_before_firstRecord = 5
-years_after_firstRecord = 1
-end_valid_year = 2018
+years_before_firstRecord = 50
+years_after_firstRecord = 0
+end_valid_year = 2020
 sim_years = [2014, 2020]  # list(range(2006,2035))
 
 load_dotenv(os.path.join(".env"))
@@ -87,12 +93,12 @@ create_global_config_args(
     sim_name,
     start_run,
     end_run,
-    start_commodity,
-    end_commodity,
+    commodity_list,
     country_of_interest,
     native_countries_list,
     start_years,
     alphas,
+    betas,
     lamdas,
     transmission_lag_type,
     gamma_shape,
@@ -106,4 +112,5 @@ create_global_config_args(
     years_after_firstRecord,
     end_valid_year,
     sim_years,
+    lamda_weights_path,
 )

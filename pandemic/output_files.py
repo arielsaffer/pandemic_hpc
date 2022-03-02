@@ -1,3 +1,23 @@
+"""
+PoPS Global
+
+Module containing all functions for saving, formatting, and aggregating
+outputs for the PoPS Global model.
+
+Copyright (C) 2019-2021 by the authors.
+
+Authors: Chris Jones (cmjone25 ncsu edu)
+         Chelsey Walden-Schreiner (cawalden ncsu edu)
+
+
+The code contained herein is licensed under the GNU General Public
+License. You may obtain a copy of the GNU General Public License
+Version 3 or later at the following locations:
+
+http://www.opensource.org/licenses/gpl-license.html
+http://www.gnu.org/copyleft/gpl.html
+"""
+
 import os
 import numpy as np
 import pandas as pd
@@ -13,15 +33,15 @@ def create_model_dirs(
     write_country_intros=False,
 ):
     """
-    Creates directory and folders for pandemic output files.
+    Creates directory and folders for model output files.
 
     Parameters
     ----------
     outpath : String
-        Absolute path of directory where pandemic output are saved
+        Absolute path of directory where model output are saved
     output_dict : Dictionary
         Key-value pairs identifying the object name and folder name
-        of pandemic output components.
+        of model output components.
     write_entry_probs : bool
         Indicates whether to save n x n matrices for each time
         step where n is the number of countries, and values
@@ -66,14 +86,14 @@ def save_model_output(
     columns_to_drop=None,
 ):
     """
-    Saves pandemic output, including probabilities for entry, establishment,
+    Saves model output, including probabilities for entry, establishment,
     and introduction. Full forecast dataframe, origin-destination pairs,
     and list of time steps formatted as YYYYMM.
 
     Parameters
     ----------
     model_output_object : numpy array
-        List of 6 n x n arrays created by running pandemic pandemic, ordered as
+        List of 6 n x n arrays created by running pandemic model, ordered as
         1) full forecast dataframe; 2) probability of entry;
         3) probability of establishment; 4) probability of introduction;
         5) origin - destination pairs; and 6) list of countries where pest is
@@ -101,13 +121,13 @@ def save_model_output(
         represent the origin-destination probability of
         introduction. Default is False.
     columns_to_drop : list
-        Optional list of columns used or created by the pandemic that are to drop
+        Optional list of columns used or created by the model that are to drop
         from the final output (e.g., Koppen climate classifications)
 
     Returns
     -------
     model_output_df : geodataframe
-        Geodataframe of pandemic outputs
+        Geodataframe of model outputs
 
 
     """
@@ -119,7 +139,7 @@ def save_model_output(
     origin_dst = model_output_object[4]
     country_intro = model_output_object[5]
 
-    # saving main pandemic output with overall introduction
+    # saving main model output with overall introduction
     # probabilities for each time step
     if columns_to_drop is not None:
         model_output_gdf = model_output_gdf.drop(columns_to_drop, axis=1)
@@ -144,7 +164,9 @@ def save_model_output(
             country_int_pd.columns = example_trade_matrix.columns
             country_int_pd.index = example_trade_matrix.index
             country_int_pd.to_csv(
-                outpath + f"/country_introduction/country_introduction_{str(ts)}.csv",
+                outpath + (
+                    f"/country_introduction/country_introduction_{str(ts)}.csv"
+                ),
                 float_format="%.4f",
                 na_rep="NAN!",
             )
@@ -164,7 +186,10 @@ def save_model_output(
             pro_est_pd.columns = example_trade_matrix.columns
             pro_est_pd.index = example_trade_matrix.index
             pro_est_pd.to_csv(
-                outpath + f"/prob_est/probability_of_establishment_{str(ts)}.csv",
+                (
+                    outpath +
+                    f"/prob_est/probability_of_establishment_{str(ts)}.csv"
+                ),
                 float_format="%.4f",
                 na_rep="NAN!",
             )
@@ -174,7 +199,10 @@ def save_model_output(
             pro_intro_pd.columns = example_trade_matrix.columns
             pro_intro_pd.index = example_trade_matrix.index
             pro_intro_pd.to_csv(
-                outpath + f"/prob_intro/probability_of_introduction_{str(ts)}.csv",
+                (
+                    outpath +
+                    f"/prob_intro/probability_of_introduction_{str(ts)}.csv"
+                ),
                 float_format="%.4f",
                 na_rep="NAN!",
             )
@@ -225,7 +253,7 @@ def get_feature_cols(geojson_obj, feature_chars):
     ----------
     geojson_obj : geodataframe
         A geodataframe object containing the original
-        pandemic output columns and format
+        model output columns and format
 
     feature_chars : str
         String of characters identifying the column
@@ -247,9 +275,15 @@ def get_feature_cols(geojson_obj, feature_chars):
 
     """
 
-    feature_cols = [c for c in geojson_obj.columns if c.startswith(feature_chars)]
-    feature_cols_monthly = [c for c in feature_cols if len(c.split(" ")[-1]) > 5]
-    feature_cols_annual = [c for c in feature_cols if c not in feature_cols_monthly]
+    feature_cols = (
+        [c for c in geojson_obj.columns if c.startswith(feature_chars)]
+    )
+    feature_cols_monthly = (
+        [c for c in feature_cols if len(c.split(" ")[-1]) > 5]
+    )
+    feature_cols_annual = (
+        [c for c in feature_cols if c not in feature_cols_monthly]
+    )
 
     return feature_cols, feature_cols_monthly, feature_cols_annual
 
@@ -263,7 +297,7 @@ def create_feature_dict(geojson_obj, column_list, chars_to_strip):
     ----------
     geojson_obj : geodataframe
         A geodataframe containing the original
-        pandemic output columns and format
+        model output columns and format
 
     column_list : list
         List of columns to use
@@ -294,7 +328,7 @@ def add_dict_to_geojson(geojson_obj, new_col_name, dictionary_obj):
     ----------
     geojson_obj : geodataframe
         A geodataframe containing the original
-        pandemic output columns and format
+        model output columns and format
 
     new_col_name : str
         Name of new column to be added to the
@@ -318,13 +352,13 @@ def add_dict_to_geojson(geojson_obj, new_col_name, dictionary_obj):
 
 def aggregate_monthly_output_to_annual(formatted_geojson, outpath):
     """
-    Aggregate monthly time step predictions from the pandemic to annual
+    Aggregate monthly time step predictions from the model to annual
     predictions of presence and probability of introduction
 
     Parameters
     ----------
     formatted_geojson : geodataframe
-        Geodataframe containing original pandemic output as well as
+        Geodataframe containing original model output as well as
         additional columns with year: value dictionaries.
 
     outpath : str
@@ -340,18 +374,24 @@ def aggregate_monthly_output_to_annual(formatted_geojson, outpath):
         for c in formatted_geojson.columns
         if c.startswith("Probability of introduction")
     ]
-    annual_ts_list = sorted(set([y.split(" ")[-1][:4] for y in prob_intro_cols]))
+    annual_ts_list = sorted(
+        set([y.split(" ")[-1][:4] for y in prob_intro_cols])
+    )
     for year in annual_ts_list:
         prob_cols = [c for c in prob_intro_cols if str(year) in c]
         formatted_geojson[f"Agg Prob Intro {year}"] = formatted_geojson.apply(
             lambda row: agg_prob(row=row, column_list=prob_cols), axis=1
         )
-        formatted_geojson[f"Presence {year}"] = formatted_geojson[f"Presence {year}12"]
+        formatted_geojson[f"Presence {year}"] = (
+            formatted_geojson[f"Presence {year}12"]
+        )
 
     out_csv = pd.DataFrame(formatted_geojson)
     out_csv.drop(["geometry"], axis=1, inplace=True)
     out_csv.to_csv(
-        outpath + "/pandemic_output_aggregated.csv", float_format="%.2f", na_rep="NAN!"
+        outpath + "/pandemic_output_aggregated.csv",
+        float_format="%.2f",
+        na_rep="NAN!"
     )
 
 
@@ -359,27 +399,25 @@ def write_annual_output(formatted_geojson, outpath):
     """
     When the model is run with an annual timestep, export the annual
     predictions of presence and probability of introduction
-
     Parameters
     ----------
     formatted_geojson : geodataframe
         Geodataframe containing original pandemic output as well as
         additional columns with year: value dictionaries.
-
     outpath : str
         Directory path to save output (geojson and csv)
-
     Returns
     -------
     none
-
     """
     prob_intro_cols = [
         c
         for c in formatted_geojson.columns
         if c.startswith("Probability of introduction")
     ]
-    annual_ts_list = sorted(set([y.split(" ")[-1][:4] for y in prob_intro_cols]))
+    annual_ts_list = sorted(
+        set([y.split(" ")[-1][:4] for y in prob_intro_cols])
+    )
     for year in annual_ts_list:
         formatted_geojson[f"Agg Prob Intro {year}"] = formatted_geojson[
             f"Probability of introduction {year}"
@@ -388,7 +426,9 @@ def write_annual_output(formatted_geojson, outpath):
     out_csv = pd.DataFrame(formatted_geojson)
     out_csv.drop(["geometry"], axis=1, inplace=True)
     out_csv.to_csv(
-        outpath + "/pandemic_output_aggregated.csv", float_format="%.2f", na_rep="NAN!"
+        outpath + "/pandemic_output_aggregated.csv",
+        float_format="%.2f",
+        na_rep="NAN!"
     )
 
 
@@ -406,26 +446,26 @@ def write_model_metadata(
     end_sim_year,
     transmission_lag_type,
     time_infect,
-    time_infect_units,
     gamma_shape,
     gamma_scale,
     random_seed,
     native_countries_list,
     countries_path,
-    commodities_available,
+    commodity,
     commodity_forecast_path,
     phyto_weights,
     outpath,
     run_num,
     scenario_list=None,
+    lamda_weights_path=None,
 ):
     """
-    Write pandemic parameters and configuration to metadata file
+    Write model parameters and configuration to metadata file
 
     Parameters
     ----------
     numpy array
-        List of 6 n x n arrays created by running pandemic pandemic, ordered as
+        List of 6 n x n arrays created by running pandemic model, ordered as
         1) full forecast dataframe; 2) probability of entry;
         3) probability of establishment; 4) probability of introduction;
         5) origin - destination pairs; and 6) list of countries where pest is
@@ -459,8 +499,6 @@ def write_model_metadata(
     transmission_lag_type : str
         Type of transmission lag used in the simulation (i.e., None,
         static, or stochastic)
-    time_infect_units : str
-        Units associated with the transmission lag value (i.e., years, months)
     time_infect : int
         Time until a country is infectious, set for static transmission lag
     gamma_shape : float
@@ -468,10 +506,11 @@ def write_model_metadata(
     gamma_scale: float
         Scale parameter for gamma distribution used in stochastic transmission.
     native_countries_list : list
-        Countries with pest or pathogen present at first time step of simulation
+        Countries with pest or pathogen present at first time step
+        of simulation
     countries_path : str
         File path to countries geopackage used
-    commodities_available :
+    commodity :
         Commodity simulated
     commodity_forecast_path : str
         Path to forecasted trade data
@@ -507,7 +546,6 @@ def write_model_metadata(
             "end_sim_year": str(end_sim_year),
             "transmission_lag_type": str(transmission_lag_type),
             "infectivity_lag": time_infect,
-            "transmission_lag_units": time_infect_units,
             "gamma_shape": gamma_shape,
             "gamma_scale": gamma_scale,
             "random_seed": str(random_seed),
@@ -519,7 +557,7 @@ def write_model_metadata(
         meta["PARAMETERS"][0].update({"infectivity_lag": None})
     meta["NATIVE_COUNTRIES_T0"] = native_countries_list
     meta["COUNTRIES GPKG"] = countries_path
-    meta["COMMODITY"] = commodities_available
+    meta["COMMODITY"] = commodity
     meta["FORECASTED"] = commodity_forecast_path
     meta["PHYTOSANITARY_CAPACITY_WEIGHTS"] = phyto_weights
     meta["TOTAL COUNTRIES INTRODUCTED"] = str(
@@ -527,6 +565,7 @@ def write_model_metadata(
         - len(native_countries_list)
     )
     meta["TRADE SCENARIO"] = scenario_list
+    meta["LAMDA WEIGHTS"] = lamda_weights_path
 
     with open(f"{outpath}/run_{run_num}_meta.json", "w") as file:
         json.dump(meta, file, indent=4)
