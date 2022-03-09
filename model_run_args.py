@@ -47,9 +47,6 @@ if __name__ == "__main__":
 
     config_out_path = (
 
-        rf"year{start_year}_alpha{alpha}"
-        rf"_beta{beta}"
-        rf"_lamda{lamda_c_list[0]}"
         rf"{out_dir}/config/"
         rf"year{start_year}_alpha{alpha}"
         rf"_beta{beta}"
