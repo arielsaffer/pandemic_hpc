@@ -234,7 +234,10 @@ def pandemic_single_time_step(
             int(time_step) >= int(origin["Infective"])
         ):
             zeta_it = 1
-            delta_kappa_ijt = 1 - climate_similarities[j, i]
+            if len(climate_similarities.shape) == 1:
+                delta_kappa_ijt = 1 - climate_similarities[j]
+            else:
+                delta_kappa_ijt = 1 - climate_similarities[j, i]
 
             if T_ijct == 0:
                 probability_of_entry_ijct = 0
@@ -261,14 +264,7 @@ def pandemic_single_time_step(
                 )
 
             probability_of_establishment_ijt = probability_of_establishment(
-                alpha,
-                beta,
-                delta_kappa_ijt,
-                sigma_kappa,
-                h_jt,
-                sigma_h,
-                phi,
-                w_phi,
+                alpha, beta, delta_kappa_ijt, sigma_kappa, h_jt, sigma_h, phi, w_phi,
             )
         else:
             zeta_it = 0
@@ -283,7 +279,7 @@ def pandemic_single_time_step(
         introduction_probabilities[j, i] = probability_of_introduction_ijtc
 
         # decide if an introduction happens
-        if len(time_step)==4:
+        if len(time_step) == 4:
             introduced = np.random.binomial(12, probability_of_introduction_ijtc)
         else:
             introduced = np.random.binomial(1, probability_of_introduction_ijtc)
