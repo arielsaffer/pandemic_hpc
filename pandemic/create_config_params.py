@@ -1,5 +1,5 @@
-import json
 import os
+import json
 
 
 def create_config_args(
@@ -67,7 +67,7 @@ def create_config_args(
     args["save_intro"] = save_intro
     args["save_country_intros"] = save_country_intros
     args["columns_to_drop"] = cols_to_drop
-    args['scenario_list'] = scenario_list
+    args["scenario_list"] = scenario_list
 
     # Write arguments to json file
     config_json_path = config_out_path
