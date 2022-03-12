@@ -27,7 +27,6 @@ import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 from helpers import create_trades_list
-from model_equations import pandemic_multiple_time_steps
 from output_files import (
     aggregate_monthly_output_to_annual,
     write_annual_output,
@@ -81,6 +80,7 @@ with open("config.json") as json_file:
     config = json.load(json_file)
 
 model_files = config["model_files"]
+quiet_time = config["quiet_time"]
 
 # If writing to a temporary directory
 if model_files == "Temp":
@@ -88,6 +88,12 @@ if model_files == "Temp":
     out_dir = f"{temp_dir}/samp{alpha}_{lamda_c_list[0]}_{start_year}"
 else:
     out_dir = os.getenv("OUTPUT_PATH")
+
+# If the model should print out each timestep as it runs
+if quiet_time == True:
+    from model_equations_quiet import pandemic_multiple_time_steps
+else:
+    from model_equations import pandemic_multiple_time_steps
 
 countries = geopandas.read_file(countries_path, driver="GPKG")
 distances = np.load(input_dir + "/distance_matrix.npy")
