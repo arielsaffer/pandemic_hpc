@@ -33,6 +33,7 @@ if __name__ == "__main__":
     season_dict = config["season_dict"]
     lamda_weights_path = config["lamda_weights_path"]
     commodity_list = config["commodity_list"]
+    trade_type = config["trade_type"]
 
     commodity = "-".join(str(elem) for elem in commodity_list)
 
@@ -46,7 +47,6 @@ if __name__ == "__main__":
         out_dir = os.getenv("OUTPUT_PATH")
 
     config_out_path = (
-
         rf"{out_dir}/config/"
         rf"year{start_year}_alpha{alpha}"
         rf"_beta{beta}"
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     param_vals, config_file_path = create_config_args(
         config_out_path=config_out_path,
         commodity_list=commodity_list,
-        commodity_path=input_dir + f"/comtrade/{timestep}_adjusted/",
+        commodity_path=input_dir + f"/comtrade/{timestep}_{trade_type}/",
         native_countries_list=native_countries_list,
         alpha=alpha,
         beta=beta,
@@ -71,7 +71,8 @@ if __name__ == "__main__":
         save_estab=False,
         save_intro=False,
         save_country_intros=False,
-        commodity_forecast_path=input_dir + f"/comtrade/trade_forecast/{timestep}_adjusted/",
+        commodity_forecast_path=input_dir
+        + f"/comtrade/trade_forecast/{timestep}_{trade_type}/",
         season_dict=season_dict,
         transmission_lag_type=transmission_lag_type,
         time_to_infectivity=None,
